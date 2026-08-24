@@ -19,6 +19,7 @@ export default function Home() {
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
   const [cameraControlsEnabled, setCameraControlsEnabled] = useState(false);
   const [isMonitorFocused, setIsMonitorFocused] = useState(false);
+  const [isSceneReady, setIsSceneReady] = useState(false);
 
   const openProjects = useCallback((category: ProjectCategory, projectId?: string) => {
     setSelectedProjectId(projectId ?? null);
@@ -41,9 +42,14 @@ export default function Home() {
   return (
     <main className="relative min-h-dvh overflow-hidden bg-[#11141a] text-white">
       <section aria-label="3D 작업 책상" className="absolute inset-0">
-        <DeskScene onSelect={openProjects} cameraControlsEnabled={cameraControlsEnabled} onMonitorFocusChange={setIsMonitorFocused} />
+        <DeskScene
+          onSelect={openProjects}
+          cameraControlsEnabled={cameraControlsEnabled}
+          onMonitorFocusChange={setIsMonitorFocused}
+          onSceneReady={() => setIsSceneReady(true)}
+        />
       </section>
-      <IntroOverlay cameraControlsEnabled={cameraControlsEnabled} hidden={isMonitorFocused} onToggleCamera={() => setCameraControlsEnabled((enabled) => !enabled)} />
+      <IntroOverlay cameraControlsEnabled={cameraControlsEnabled} hidden={!isSceneReady || isMonitorFocused} onToggleCamera={() => setCameraControlsEnabled((enabled) => !enabled)} />
       <ProjectPanel category={activeCategory} selectedProjectId={selectedProjectId} onClose={closePanel} />
     </main>
   );

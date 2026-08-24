@@ -277,10 +277,12 @@ export function DeskScene({
   onSelect,
   cameraControlsEnabled,
   onMonitorFocusChange,
+  onSceneReady,
 }: {
   onSelect: (category: ProjectCategory, projectId?: string) => void;
   cameraControlsEnabled: boolean;
   onMonitorFocusChange: (focused: boolean) => void;
+  onSceneReady: () => void;
 }) {
   const [monitorFocused, setMonitorFocused] = useState(false);
   const [resumeOpen, setResumeOpen] = useState(false);
@@ -339,7 +341,10 @@ export function DeskScene({
       </AnimatePresence>
       <SceneBranding
         hidden={monitorFocused || resumeOpen}
-        onReveal={() => setSceneVisible(true)}
+        onReveal={() => {
+          setSceneVisible(true);
+          onSceneReady();
+        }}
       />
       {monitorFocused && (
         <>
