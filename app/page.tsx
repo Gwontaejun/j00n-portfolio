@@ -10,7 +10,7 @@ const DeskScene = dynamic(
   () => import('@/features/desk-interaction/components/DeskScene').then((module) => module.DeskScene),
   {
     ssr: false,
-    loading: () => <div className="grid h-full place-items-center text-sm text-white/60">작업 공간을 준비하는 중...</div>,
+    loading: () => <div className="h-full bg-[#080a0e]" />,
   },
 );
 

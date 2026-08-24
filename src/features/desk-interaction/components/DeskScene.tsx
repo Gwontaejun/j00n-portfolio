@@ -8,9 +8,10 @@ import {
   Lightformer,
   OrbitControls,
   useGLTF,
+  useProgress,
 } from "@react-three/drei";
 import { MathUtils, MOUSE, Vector3 } from "three";
-import { AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 import { ModelAsset } from "./ModelAsset";
 import { DeskAccessories } from "./DeskAccessories";
@@ -163,6 +164,115 @@ function Workspace({
   );
 }
 
+function SceneBranding({ hidden, onReveal }: { hidden: boolean; onReveal: () => void }) {
+  const { active, progress } = useProgress();
+  const reduceMotion = useReducedMotion();
+  const [splashVisible, setSplashVisible] = useState(true);
+  const [exitComplete, setExitComplete] = useState(false);
+  const [typedCharacterCount, setTypedCharacterCount] = useState(0);
+
+  useEffect(() => {
+    if (active || progress < 100) return;
+
+    const characterDelay = reduceMotion ? 0 : 400;
+    const typingStartDelay = reduceMotion ? 0 : 180;
+    const timers = Array.from({ length: 4 }, (_, index) =>
+      window.setTimeout(
+        () => setTypedCharacterCount(index + 1),
+        typingStartDelay + index * characterDelay,
+      ),
+    );
+    const hideTimer = window.setTimeout(
+      () => setSplashVisible(false),
+      reduceMotion ? 100 : typingStartDelay + characterDelay * 3 + 1450,
+    );
+    return () => {
+      timers.forEach((timer) => window.clearTimeout(timer));
+      window.clearTimeout(hideTimer);
+    };
+  }, [active, progress, reduceMotion]);
+
+  const roundedProgress = Math.min(100, Math.max(0, Math.round(progress)));
+
+  return (
+    <>
+      <AnimatePresence
+        onExitComplete={() => {
+          setExitComplete(true);
+          onReveal();
+        }}
+      >
+        {splashVisible && (
+          <motion.div
+            aria-live="polite"
+            aria-label={`포트폴리오 로딩 중 ${roundedProgress}%`}
+            initial={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: reduceMotion ? 0.1 : 0.7, ease: "easeInOut" }}
+            className="pointer-events-none absolute inset-0 z-50 grid place-items-center bg-[radial-gradient(circle_at_50%_42%,#18202a_0%,#0b0e13_48%,#06080b_100%)] text-white"
+          >
+            <motion.div
+              initial={reduceMotion ? false : { opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
+              className="text-center"
+            >
+              <p
+                aria-label="J00N"
+                className="inline-flex items-baseline text-4xl font-semibold tracking-[-0.06em] sm:text-6xl"
+              >
+                <span aria-hidden="true">{"J00N".slice(0, typedCharacterCount)}</span>
+                <motion.span
+                  aria-hidden="true"
+                  initial={{ opacity: reduceMotion ? 0 : 1 }}
+                  animate={{ opacity: reduceMotion ? 0 : [1, 1, 0, 0] }}
+                  transition={{
+                    duration: 0.85,
+                    delay: reduceMotion ? 0 : 0.95,
+                    repeat: reduceMotion ? 0 : Infinity,
+                    ease: "linear",
+                  }}
+                  className="ml-1 inline-block h-[0.78em] w-[2px] bg-white/75 sm:w-[3px]"
+                />
+              </p>
+              <motion.p
+                aria-hidden={typedCharacterCount !== 4}
+                initial={false}
+                animate={{
+                  opacity: typedCharacterCount === 4 ? 1 : 0,
+                  y: typedCharacterCount === 4 ? 0 : 3,
+                }}
+                transition={{
+                  duration: reduceMotion ? 0 : 0.45,
+                  delay: !reduceMotion && typedCharacterCount === 4 ? 0.3 : 0,
+                }}
+                className="mt-2 text-[10px] tracking-[0.52em] text-white/45 sm:text-[11px]"
+              >
+                PORTFOLIO
+              </motion.p>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {exitComplete && !hidden && (
+          <motion.div
+            initial={{ opacity: 0, x: -8 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -6 }}
+            transition={{ duration: reduceMotion ? 0.1 : 0.4 }}
+            className="pointer-events-none absolute left-5 top-5 z-20 text-center text-white sm:left-8 sm:top-8"
+          >
+            <p className="text-[38px] font-semibold leading-none tracking-[-0.06em]">J00N</p>
+            <p className="mt-[5px] text-[7px] tracking-[0.52em] text-white/42">PORTFOLIO</p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
+  );
+}
+
 export function DeskScene({
   onSelect,
   cameraControlsEnabled,
@@ -174,6 +284,7 @@ export function DeskScene({
 }) {
   const [monitorFocused, setMonitorFocused] = useState(false);
   const [resumeOpen, setResumeOpen] = useState(false);
+  const [sceneVisible, setSceneVisible] = useState(false);
   const handleSelect = useCallback(
     (category: ProjectCategory, projectId?: string) => {
       onSelect(category, projectId);
@@ -203,6 +314,10 @@ export function DeskScene({
         shadows
         camera={{ position: CAMERA_POSITION, fov: 41 }}
         gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
+        style={{
+          opacity: sceneVisible ? 1 : 0,
+          transition: `opacity ${sceneVisible ? 500 : 0}ms ease-out`,
+        }}
       >
         <fog attach="fog" args={["#080a0e", 8, 14]} />
         <Suspense fallback={null}>
@@ -222,6 +337,10 @@ export function DeskScene({
       <AnimatePresence>
         {resumeOpen && <ResumeViewer onClose={() => setResumeOpen(false)} />}
       </AnimatePresence>
+      <SceneBranding
+        hidden={monitorFocused || resumeOpen}
+        onReveal={() => setSceneVisible(true)}
+      />
       {monitorFocused && (
         <>
           <button
