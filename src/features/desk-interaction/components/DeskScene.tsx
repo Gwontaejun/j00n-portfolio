@@ -10,13 +10,15 @@ import {
   useGLTF,
 } from "@react-three/drei";
 import { MathUtils, MOUSE, Vector3 } from "three";
+import { AnimatePresence } from "framer-motion";
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 import { ModelAsset } from "./ModelAsset";
 import { DeskAccessories } from "./DeskAccessories";
 import { Monitor } from "./Monitor";
 import { Phone } from "./Phone";
 import { RoomEnvironment } from "./RoomEnvironment";
-import { WelcomeHint } from "./WelcomeHint";
+import { CopyHolder } from "./CopyHolder";
+import { ResumeViewer } from "./ResumeViewer";
 import type { ProjectCategory } from "@/types/project";
 import { CAMERA_POSITION, CAMERA_TARGET, DESK_BASE_Y } from "../model/scene";
 
@@ -25,13 +27,13 @@ function Workspace({
   cameraControlsEnabled,
   monitorFocused,
   onFocusMonitor,
-  onReady,
+  onOpenResume,
 }: {
   onSelect: (category: ProjectCategory, projectId?: string) => void;
   cameraControlsEnabled: boolean;
   monitorFocused: boolean;
   onFocusMonitor: () => void;
-  onReady: () => void;
+  onOpenResume: () => void;
 }) {
   const camera = useThree((state) => state.camera);
   const controlsRef = useRef<OrbitControlsImpl>(null);
@@ -41,7 +43,6 @@ function Workspace({
   const defaultTarget = useRef(new Vector3(...CAMERA_TARGET));
   const monitorPosition = useRef(new Vector3(0, 2.08, 1.2));
   const monitorTarget = useRef(new Vector3(0, 2.1, -0.5));
-
   useFrame((_, delta) => {
     if (monitorFocused) cameraTransitioning.current = true;
 
@@ -80,15 +81,13 @@ function Workspace({
     }
   });
 
-  useEffect(() => onReady(), [onReady]);
-
   return (
     <>
-      <ambientLight intensity={0.3} color="#dce6f4" />
+      <ambientLight intensity={0.09} color="#cbd7e5" />
       <directionalLight
         position={[0, 7, 0.8]}
-        color="#fff0dc"
-        intensity={4.2}
+        color="#d9e1eb"
+        intensity={1.7}
         castShadow
         shadow-mapSize={[1024, 1024]}
         shadow-bias={-0.0002}
@@ -96,25 +95,25 @@ function Workspace({
       <pointLight
         position={[2.8, 2.2, 3]}
         color="#8cbcf0"
-        intensity={3.5}
+        intensity={0.9}
         distance={8}
       />
       <Environment resolution={128}>
         <Lightformer
-          intensity={3.5}
-          color="#fff0dc"
+          intensity={1.2}
+          color="#d8e1ec"
           position={[0, 6, 0]}
           rotation={[Math.PI / 2, 0, 0]}
           scale={[5, 5, 1]}
         />
         <Lightformer
-          intensity={1.2}
+          intensity={0.4}
           color="#a8d1ff"
           position={[4, 2, 4]}
           scale={[3, 2, 1]}
         />
         <Lightformer
-          intensity={0.8}
+          intensity={0.25}
           color="#ffffff"
           position={[0, 5, -4]}
           scale={[6, 2, 1]}
@@ -128,6 +127,7 @@ function Workspace({
       </group>
       <Monitor focused={monitorFocused} onClick={onFocusMonitor} />
       <DeskAccessories />
+      <CopyHolder onSelect={onOpenResume} />
       <Phone onSelect={(projectId) => onSelect("app", projectId)} />
 
       <ContactShadows
@@ -172,26 +172,21 @@ export function DeskScene({
   cameraControlsEnabled: boolean;
   onMonitorFocusChange: (focused: boolean) => void;
 }) {
-  const [welcomeVisible, setWelcomeVisible] = useState(false);
   const [monitorFocused, setMonitorFocused] = useState(false);
-  const showWelcome = useCallback(() => setWelcomeVisible(true), []);
+  const [resumeOpen, setResumeOpen] = useState(false);
   const handleSelect = useCallback(
     (category: ProjectCategory, projectId?: string) => {
-      setWelcomeVisible(false);
       onSelect(category, projectId);
     },
     [onSelect],
   );
 
   useEffect(() => {
-    if (!welcomeVisible) return;
-    const timer = window.setTimeout(() => setWelcomeVisible(false), 3000);
-    return () => window.clearTimeout(timer);
-  }, [welcomeVisible]);
-
-  useEffect(() => {
     const handleEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setMonitorFocused(false);
+      if (event.key === "Escape") {
+        setMonitorFocused(false);
+        setResumeOpen(false);
+      }
     };
     window.addEventListener("keydown", handleEscape);
     return () => window.removeEventListener("keydown", handleEscape);
@@ -207,7 +202,7 @@ export function DeskScene({
         dpr={[1, 2]}
         shadows
         camera={{ position: CAMERA_POSITION, fov: 41 }}
-        gl={{ antialias: true, powerPreference: "high-performance" }}
+        gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
       >
         <fog attach="fog" args={["#080a0e", 8, 14]} />
         <Suspense fallback={null}>
@@ -216,19 +211,25 @@ export function DeskScene({
             cameraControlsEnabled={cameraControlsEnabled}
             monitorFocused={monitorFocused}
             onFocusMonitor={() => {
-              setWelcomeVisible(false);
               setMonitorFocused(true);
             }}
-            onReady={showWelcome}
+            onOpenResume={() => {
+              setResumeOpen(true);
+            }}
           />
         </Suspense>
       </Canvas>
+      <AnimatePresence>
+        {resumeOpen && <ResumeViewer onClose={() => setResumeOpen(false)} />}
+      </AnimatePresence>
       {monitorFocused && (
         <>
           <button
             type="button"
             aria-label="책상으로 돌아가기"
-            onClick={() => setMonitorFocused(false)}
+            onClick={() => {
+              setMonitorFocused(false);
+            }}
             className="absolute left-5 top-5 z-30 grid size-10 place-items-center text-2xl text-white/65 transition hover:-translate-x-0.5 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-200 sm:left-8 sm:top-8"
           >
             <span aria-hidden="true">←</span>
@@ -238,10 +239,6 @@ export function DeskScene({
           </p>
         </>
       )}
-      <WelcomeHint
-        visible={welcomeVisible}
-        onDismiss={() => setWelcomeVisible(false)}
-      />
     </div>
   );
 }

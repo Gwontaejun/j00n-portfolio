@@ -2,51 +2,95 @@
 
 import { useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
-import { RoundedBox } from "@react-three/drei";
-import { DoubleSide, InstancedMesh, Object3D } from "three";
+import { RoundedBox, useTexture } from "@react-three/drei";
+import { DoubleSide, ShaderMaterial, SRGBColorSpace } from "three";
 
-const RAIN_DROP_COUNT = 84;
+const rainVertexShader = /* glsl */ `
+  varying vec2 vUv;
+
+  void main() {
+    vUv = uv;
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+  }
+`;
+
+const rainFragmentShader = /* glsl */ `
+  precision highp float;
+
+  uniform float uTime;
+  varying vec2 vUv;
+
+  float hash21(vec2 p) {
+    p = fract(p * vec2(123.34, 345.45));
+    p += dot(p, p + 34.345);
+    return fract(p.x * p.y);
+  }
+
+  float rainLayer(vec2 uv, float columns, float speed, float seed) {
+    vec2 p = uv;
+    p.x += p.y * 0.055;
+    p *= vec2(columns, columns * 0.34);
+
+    float column = floor(p.x);
+    float columnRandom = hash21(vec2(column, seed));
+    float fallSpeed = speed * mix(0.48, 1.55, columnRandom);
+    p.y += uTime * fallSpeed + columnRandom * 9.7;
+    p.x += sin(uTime * 0.1 + columnRandom * 12.0) * 0.008;
+
+    vec2 cell = floor(p);
+    vec2 local = fract(p) - 0.5;
+    float random = hash21(cell + seed);
+    float random2 = hash21(cell + seed + 17.4);
+    float timeOffset = hash21(cell + seed + 31.8);
+    local.y += (timeOffset - 0.5) * 0.34;
+    local.x += (random - 0.5) * 0.9;
+    local.x += sin(local.y * 8.0 + random * 6.283) * 0.003;
+
+    float width = mix(0.003, 0.009, random);
+    float line = 1.0 - smoothstep(width, width + 0.009, abs(local.x));
+    float head = mix(0.02, 0.42, random2);
+    float dropLength = mix(0.1, 0.5, random);
+    float tail = head - dropLength;
+    float segment = smoothstep(tail - 0.05, tail + 0.035, local.y)
+      * (1.0 - smoothstep(head, head + 0.07, local.y));
+    float headGlow = 1.0 - smoothstep(width * 1.3, width * 3.8, length(vec2(local.x, (local.y - head) * 0.52)));
+    float presence = step(0.34, random);
+
+    return (line * segment + headGlow * 0.2) * presence;
+  }
+
+  void main() {
+    float farRain = rainLayer(vUv, 27.0, 4.56, 1.3);
+    float nearRain = rainLayer(vUv + vec2(0.13, 0.0), 17.0, 6.96, 4.9);
+
+    float softPulse = 0.94 + sin(uTime * 0.42) * 0.06;
+    float alpha = (farRain * 0.055 + nearRain * 0.095) * softPulse;
+    vec3 color = mix(vec3(0.52, 0.67, 0.76), vec3(0.82, 0.91, 0.95), nearRain);
+
+    gl_FragColor = vec4(color, clamp(alpha, 0.0, 0.18));
+  }
+`;
 
 function WindowRain() {
-  const rainRef = useRef<InstancedMesh>(null);
-  const dummy = useMemo(() => new Object3D(), []);
-  const drops = useMemo(
-    () =>
-      Array.from({ length: RAIN_DROP_COUNT }, (_, index) => ({
-        x: ((Math.sin(index * 91.73) + 1) / 2) * 4.8 - 2.4,
-        y: ((Math.sin(index * 47.11 + 2) + 1) / 2) * 3.05 - 1.52,
-        z: Math.sin(index * 13.37) * 0.03,
-        speed: 0.55 + ((Math.sin(index * 23.9) + 1) / 2) * 0.7,
-        length: 0.045 + ((Math.sin(index * 7.17) + 1) / 2) * 0.09,
-      })),
-    [],
-  );
+  const materialRef = useRef<ShaderMaterial>(null);
 
-  useFrame((_, delta) => {
-    if (!rainRef.current) return;
-
-    drops.forEach((drop, index) => {
-      drop.y -= drop.speed * Math.min(delta, 0.05);
-      if (drop.y < -1.62) drop.y = 1.62;
-      dummy.position.set(drop.x, drop.y, drop.z);
-      dummy.scale.set(1, drop.length, 1);
-      dummy.updateMatrix();
-      rainRef.current?.setMatrixAt(index, dummy.matrix);
-    });
-    rainRef.current.instanceMatrix.needsUpdate = true;
+  useFrame(({ clock }) => {
+    if (materialRef.current) materialRef.current.uniforms.uTime.value = clock.elapsedTime;
   });
 
   return (
-    <instancedMesh ref={rainRef} args={[undefined, undefined, RAIN_DROP_COUNT]}>
-      <boxGeometry args={[0.007, 0.25, 0.005]} />
-      <meshBasicMaterial
-        color="#d7ecfb"
+    <mesh position={[0, 0, -0.015]}>
+      <planeGeometry args={[5.08, 3.32]} />
+      <shaderMaterial
+        ref={materialRef}
+        vertexShader={rainVertexShader}
+        fragmentShader={rainFragmentShader}
+        uniforms={{ uTime: { value: 0 } }}
         transparent
-        opacity={0.34}
         depthWrite={false}
         toneMapped={false}
       />
-    </instancedMesh>
+    </mesh>
   );
 }
 
@@ -59,14 +103,22 @@ function WallSconce({ x }: { x: number }) {
       </mesh>
       <mesh position={[0, -0.28, 0.05]} castShadow>
         <sphereGeometry args={[0.18, 20, 16]} />
-        <meshStandardMaterial color="#ffd39a" emissive="#ffad58" emissiveIntensity={1.7} roughness={0.42} />
+        <meshStandardMaterial color="#dce1df" emissive="#aab6ba" emissiveIntensity={0.7} roughness={0.42} />
       </mesh>
-      <pointLight position={[0, -0.3, 0.42]} color="#ffbd78" intensity={2.7} distance={4.3} decay={2} />
+      <pointLight position={[0, -0.3, 0.42]} color="#aebfc6" intensity={0.65} distance={4.3} decay={2} />
     </group>
   );
 }
 
 export function RoomEnvironment() {
+  const sourceTexture = useTexture("/textures/rainy-night-window.webp");
+  const rainyNightTexture = useMemo(() => {
+    const texture = sourceTexture.clone();
+    texture.colorSpace = SRGBColorSpace;
+    texture.needsUpdate = true;
+    return texture;
+  }, [sourceTexture]);
+
   return (
     <group>
       <mesh position={[0, 3.11, -3.82]} receiveShadow>
@@ -109,22 +161,8 @@ export function RoomEnvironment() {
       <group position={[0, 2.3, -3.67]}>
         <mesh position={[0, 0, -0.08]}>
           <planeGeometry args={[5.15, 3.38]} />
-          <meshBasicMaterial color="#142637" toneMapped={false} />
+          <meshBasicMaterial map={rainyNightTexture} color="#929daa" toneMapped={false} />
         </mesh>
-
-        {[
-          [-1.95, 0.78, "#b6d6ea"],
-          [-1.45, -0.52, "#efb775"],
-          [-0.72, 0.12, "#8ebbd8"],
-          [0.82, -0.76, "#d79f6a"],
-          [1.46, 0.42, "#acd1e6"],
-          [2.05, -0.18, "#e3bd83"],
-        ].map(([x, y, color], index) => (
-          <mesh key={index} position={[x as number, y as number, -0.06]}>
-            <circleGeometry args={[0.025 + (index % 2) * 0.012, 12]} />
-            <meshBasicMaterial color={color as string} toneMapped={false} />
-          </mesh>
-        ))}
 
         <WindowRain />
 
@@ -181,8 +219,8 @@ export function RoomEnvironment() {
       <WallSconce x={-3.82} />
       <WallSconce x={3.82} />
 
-      <rectAreaLight position={[0, 2.45, -3.28]} rotation={[0, Math.PI, 0]} width={5} height={3.2} intensity={1.65} color="#7fb9df" />
-      <rectAreaLight position={[0, 7.42, 0]} rotation={[Math.PI / 2, 0, 0]} width={5.8} height={3.4} intensity={1.15} color="#ffe0b7" />
+      <rectAreaLight position={[0, 2.45, -3.28]} rotation={[0, Math.PI, 0]} width={5} height={3.2} intensity={0.55} color="#7799b5" />
+      <rectAreaLight position={[0, 7.42, 0]} rotation={[Math.PI / 2, 0, 0]} width={5.8} height={3.4} intensity={0.3} color="#cbd6df" />
     </group>
   );
 }

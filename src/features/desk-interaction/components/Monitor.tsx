@@ -6,11 +6,14 @@ import { AnimatePresence, motion } from "framer-motion";
 import type { IconType } from "react-icons";
 import {
   LuCode,
+  LuEye,
   LuExternalLink,
   LuFileText,
   LuLayoutGrid,
+  LuMousePointerClick,
   LuNetwork,
   LuOrbit,
+  LuSearch,
   LuShieldCheck,
 } from "react-icons/lu";
 import {
@@ -157,6 +160,11 @@ export function Monitor({ focused, onClick }: MonitorProps) {
           }}
           className={`group relative h-[488px] w-[960px] overflow-hidden rounded-[12px] border-0 bg-[#0b74c9] text-left text-[#172033] shadow-2xl outline-none transition duration-300 ${focused ? "cursor-default" : "cursor-pointer hover:ring-2 hover:ring-inset hover:ring-sky-500/35 focus-visible:ring-4 focus-visible:ring-inset focus-visible:ring-sky-500/70"}`}
         >
+          <div
+            className={`absolute inset-0 ${focused ? "pointer-events-auto" : "pointer-events-none"}`}
+            inert={!focused}
+            aria-hidden={!focused}
+          >
           <AnimatePresence initial={false}>
           {projectWindowOpen ? (
             <motion.div
@@ -329,6 +337,61 @@ export function Monitor({ focused, onClick }: MonitorProps) {
                 <span className="bg-white/25" />
               </div>
               <div className="pointer-events-none absolute inset-y-0 right-0 w-2/3 bg-[linear-gradient(90deg,transparent,rgba(255,255,255,.08))]" />
+              <section
+                aria-label="프로젝트 둘러보기 안내"
+                className="pointer-events-none absolute left-1/2 top-[47%] w-[390px] -translate-x-1/2 -translate-y-1/2 rounded-2xl border border-white/15 bg-[#07345c]/55 px-6 py-5 text-white shadow-[0_22px_65px_rgba(2,20,38,.24)] backdrop-blur-md"
+              >
+                <p className="text-[17px] font-semibold tracking-[-.025em]">
+                  프로젝트 둘러보기
+                </p>
+                <p className="mt-1.5 text-[7px] leading-[1.6] text-white/60">
+                  아이콘을 선택하거나 검색창을 이용해 프로젝트를 확인해 보세요.
+                </p>
+                <div className="mt-5 space-y-3.5">
+                  {[
+                    {
+                      icon: LuMousePointerClick,
+                      title: "프로젝트 아이콘 선택",
+                      description: "바탕화면에서 프로젝트를 바로 열 수 있어요.",
+                    },
+                    {
+                      icon: LuSearch,
+                      title: "이름 또는 기술 검색",
+                      description: "하단 검색창에서 원하는 프로젝트를 찾아보세요.",
+                    },
+                    {
+                      icon: LuLayoutGrid,
+                      title: "작업표시줄에서 다시 열기",
+                      description: "최소화한 프로젝트는 하단 아이콘으로 복원할 수 있어요.",
+                    },
+                  ].map((guide, index) => {
+                    const GuideIcon = guide.icon;
+                    return (
+                      <div key={guide.title} className="flex items-center gap-3">
+                        <span className="grid size-7 shrink-0 place-items-center rounded-lg bg-white/10 text-sky-100">
+                          <GuideIcon size={13} aria-hidden="true" />
+                        </span>
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-2">
+                            <span className="text-[6px] font-medium text-sky-200/55">
+                              0{index + 1}
+                            </span>
+                            <p className="text-[8px] font-semibold text-white/90">
+                              {guide.title}
+                            </p>
+                          </div>
+                          <p className="mt-0.5 text-[6.5px] text-white/50">
+                            {guide.description}
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+                <p className="mt-5 border-t border-white/10 pt-3 text-[6.5px] text-white/45">
+                  열린 창은 상단 버튼으로 최소화하거나 닫을 수 있습니다.
+                </p>
+              </section>
               <div className="absolute left-3 top-3 z-10 grid grid-cols-1 gap-3">
                 {webProjects.map((project) => (
                   <button
@@ -463,15 +526,18 @@ export function Monitor({ focused, onClick }: MonitorProps) {
               <span className="block">{currentDateTime.date}</span>
             </time>
           </div>
+          </div>
           {!focused && (
             <div
               aria-hidden="true"
               className="pointer-events-none absolute inset-0 z-10 grid place-items-center bg-neutral-500/0 transition-colors duration-300 group-hover:bg-neutral-500/35"
             >
               <div className="translate-y-2 opacity-0 transition duration-300 group-hover:translate-y-0 group-hover:opacity-100">
-                <span className="relative grid h-16 w-24 place-items-center rounded-[50%] border-[3px] border-white/90 bg-black/20 shadow-xl backdrop-blur-sm">
-                  <span className="size-7 rounded-full border-[3px] border-white/95 bg-white/20 shadow-[0_0_16px_rgba(255,255,255,.2)]" />
-                </span>
+                <LuEye
+                  size={96}
+                  strokeWidth={1.4}
+                  className="text-white drop-shadow-[0_4px_12px_rgba(0,0,0,.55)]"
+                />
               </div>
             </div>
           )}
