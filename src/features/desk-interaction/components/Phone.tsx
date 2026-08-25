@@ -335,21 +335,42 @@ export function Phone({ focused, interactionDisabled = false, onFocus, onSelect 
               <span className="flex-1 text-left text-[7px]">검색</span>
               <LuMic size={10} aria-hidden="true" />
             </div>
-            <div
-              onClick={(event) => {
-                event.stopPropagation();
-                if (activeScreen !== "home") setActiveScreen("home");
-              }}
-              className="relative z-10 -mx-3 -mb-2 mt-auto flex h-7 shrink-0 items-center justify-around border-t border-white/[.04] bg-[#0d0f15]/92 px-8 text-white/75 backdrop-blur-md"
-            >
-              <LuSquare size={9} strokeWidth={1.7} aria-label="최근 앱" />
-              <LuCircle size={10} strokeWidth={1.7} aria-label="홈" />
-              <LuTriangle
-                size={10}
-                strokeWidth={1.7}
-                className="rotate-90"
+            <div className="relative z-10 -mx-3 -mb-2 mt-auto flex h-7 shrink-0 items-center justify-around border-t border-white/[.04] bg-[#0d0f15]/92 px-8 text-white/75 backdrop-blur-md">
+              <button
+                type="button"
+                aria-label="최근 앱"
+                onClick={(event) => event.stopPropagation()}
+                className="grid size-6 cursor-pointer place-items-center"
+              >
+                <LuSquare size={9} strokeWidth={1.7} aria-hidden="true" />
+              </button>
+              <button
+                type="button"
+                aria-label="홈"
+                onClick={(event) => {
+                  event.stopPropagation();
+                  setActiveScreen("home");
+                }}
+                className="grid size-6 cursor-pointer place-items-center"
+              >
+                <LuCircle size={10} strokeWidth={1.7} aria-hidden="true" />
+              </button>
+              <button
+                type="button"
                 aria-label="뒤로가기"
-              />
+                onClick={(event) => {
+                  event.stopPropagation();
+                  if (activeScreen !== "home") setActiveScreen("home");
+                }}
+                className="grid size-6 cursor-pointer place-items-center"
+              >
+                <LuTriangle
+                  size={10}
+                  strokeWidth={1.7}
+                  className="-rotate-90"
+                  aria-hidden="true"
+                />
+              </button>
             </div>
 
             {!focused && (
