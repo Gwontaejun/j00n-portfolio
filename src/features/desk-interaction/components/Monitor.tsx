@@ -66,10 +66,11 @@ function SkillBadge({ name }: { name: string }) {
 
 type MonitorProps = {
   focused: boolean;
+  foregroundObjectActive?: boolean;
   onClick: () => void;
 };
 
-export function Monitor({ focused, onClick }: MonitorProps) {
+export function Monitor({ focused, foregroundObjectActive = false, onClick }: MonitorProps) {
   const currentDateTime = useCurrentDateTime();
   const [selectedProjectId, setSelectedProjectId] = useState(
     webProjects[0]?.id ?? "",
@@ -131,11 +132,11 @@ export function Monitor({ focused, onClick }: MonitorProps) {
       <Html
         center
         transform
-        occlude
+        occlude={foregroundObjectActive ? "blending" : true}
         position={[0, 1.04, 0.104]}
         distanceFactor={0.5}
         style={{
-          pointerEvents: "auto",
+          pointerEvents: foregroundObjectActive ? "none" : "auto",
           backgroundColor: "#0b74c9",
           borderRadius: "28px",
           overflow: "hidden",

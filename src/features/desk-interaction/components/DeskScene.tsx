@@ -27,13 +27,17 @@ function Workspace({
   onSelect,
   cameraControlsEnabled,
   monitorFocused,
+  phoneFocused,
   onFocusMonitor,
+  onFocusPhone,
   onOpenResume,
 }: {
   onSelect: (category: ProjectCategory, projectId?: string) => void;
   cameraControlsEnabled: boolean;
   monitorFocused: boolean;
+  phoneFocused: boolean;
   onFocusMonitor: () => void;
+  onFocusPhone: () => void;
   onOpenResume: () => void;
 }) {
   const camera = useThree((state) => state.camera);
@@ -49,8 +53,8 @@ function Workspace({
 
     const controls = controlsRef.current;
     const shouldAnimate =
-      monitorFocused || cameraTransitioning.current || !cameraControlsEnabled;
-    if (controls) controls.enabled = !shouldAnimate && cameraControlsEnabled;
+      monitorFocused || cameraTransitioning.current || (!cameraControlsEnabled && !phoneFocused);
+    if (controls) controls.enabled = !phoneFocused && !shouldAnimate && cameraControlsEnabled;
     if (!shouldAnimate) return;
 
     const position = monitorFocused
@@ -68,6 +72,7 @@ function Workspace({
 
     if (
       !monitorFocused &&
+      !phoneFocused &&
       camera.position.distanceToSquared(defaultPosition.current) < 0.0001 &&
       (!controls ||
         controls.target.distanceToSquared(defaultTarget.current) < 0.0001)
@@ -126,10 +131,26 @@ function Workspace({
       <group position={[0, DESK_BASE_Y, 0]}>
         <ModelAsset path="/3d-models/computer-desk.glb" size={6.2} />
       </group>
-      <Monitor focused={monitorFocused} onClick={onFocusMonitor} />
       <DeskAccessories />
-      <CopyHolder onSelect={onOpenResume} />
-      <Phone onSelect={(projectId) => onSelect("app", projectId)} />
+      <CopyHolder
+        interactionDisabled={monitorFocused || phoneFocused}
+        onSelect={() => {
+          if (!monitorFocused && !phoneFocused) onOpenResume();
+        }}
+      />
+      <Phone
+        focused={phoneFocused}
+        interactionDisabled={monitorFocused}
+        onFocus={onFocusPhone}
+        onSelect={(projectId) => onSelect("app", projectId)}
+      />
+      <Monitor
+        focused={monitorFocused}
+        foregroundObjectActive={phoneFocused}
+        onClick={() => {
+          if (!phoneFocused) onFocusMonitor();
+        }}
+      />
 
       <ContactShadows
         position={[0, DESK_BASE_Y - 0.01, 0]}
@@ -142,9 +163,9 @@ function Workspace({
       <OrbitControls
         ref={controlsRef}
         enabled={false}
-        enableRotate={cameraControlsEnabled && !monitorFocused}
-        enablePan={cameraControlsEnabled && !monitorFocused}
-        enableZoom={cameraControlsEnabled && !monitorFocused}
+        enableRotate={cameraControlsEnabled && !monitorFocused && !phoneFocused}
+        enablePan={cameraControlsEnabled && !monitorFocused && !phoneFocused}
+        enableZoom={cameraControlsEnabled && !monitorFocused && !phoneFocused}
         panSpeed={0.75}
         screenSpacePanning
         enableDamping
@@ -285,6 +306,7 @@ export function DeskScene({
   onSceneReady: () => void;
 }) {
   const [monitorFocused, setMonitorFocused] = useState(false);
+  const [phoneFocused, setPhoneFocused] = useState(false);
   const [resumeOpen, setResumeOpen] = useState(false);
   const [sceneVisible, setSceneVisible] = useState(false);
   const handleSelect = useCallback(
@@ -298,6 +320,7 @@ export function DeskScene({
     const handleEscape = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         setMonitorFocused(false);
+        setPhoneFocused(false);
         setResumeOpen(false);
       }
     };
@@ -306,8 +329,8 @@ export function DeskScene({
   }, []);
 
   useEffect(() => {
-    onMonitorFocusChange(monitorFocused);
-  }, [monitorFocused, onMonitorFocusChange]);
+    onMonitorFocusChange(monitorFocused || phoneFocused);
+  }, [monitorFocused, phoneFocused, onMonitorFocusChange]);
 
   return (
     <div className="relative h-full w-full bg-[radial-gradient(circle_at_50%_32%,#252c38_0%,#101319_48%,#080a0e_100%)]">
@@ -327,8 +350,14 @@ export function DeskScene({
             onSelect={handleSelect}
             cameraControlsEnabled={cameraControlsEnabled}
             monitorFocused={monitorFocused}
+            phoneFocused={phoneFocused}
             onFocusMonitor={() => {
+              setPhoneFocused(false);
               setMonitorFocused(true);
+            }}
+            onFocusPhone={() => {
+              setMonitorFocused(false);
+              setPhoneFocused(true);
             }}
             onOpenResume={() => {
               setResumeOpen(true);
@@ -340,26 +369,27 @@ export function DeskScene({
         {resumeOpen && <ResumeViewer onClose={() => setResumeOpen(false)} />}
       </AnimatePresence>
       <SceneBranding
-        hidden={monitorFocused || resumeOpen}
+        hidden={monitorFocused || phoneFocused || resumeOpen}
         onReveal={() => {
           setSceneVisible(true);
           onSceneReady();
         }}
       />
-      {monitorFocused && (
+      {(monitorFocused || phoneFocused) && (
         <>
           <button
             type="button"
             aria-label="책상으로 돌아가기"
             onClick={() => {
               setMonitorFocused(false);
+              setPhoneFocused(false);
             }}
-            className="absolute left-5 top-5 z-30 grid size-10 place-items-center text-2xl text-white/65 transition hover:-translate-x-0.5 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-200 sm:left-8 sm:top-8"
+            className="absolute left-5 top-5 z-[20000000] grid size-10 cursor-pointer place-items-center text-2xl text-white/65 transition hover:-translate-x-0.5 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-200 sm:left-8 sm:top-8"
           >
             <span aria-hidden="true">←</span>
           </button>
-          <p className="pointer-events-none absolute bottom-3 left-1/2 z-30 -translate-x-1/2 whitespace-nowrap px-4 py-2 text-xs text-white/55">
-            ESC 키 또는 좌측 상단 버튼을 누르면 책상으로 돌아갑니다.
+          <p className="pointer-events-none absolute bottom-3 left-1/2 z-[20000000] -translate-x-1/2 whitespace-nowrap px-4 py-2 text-xs text-white/55">
+            ESC 키 또는 좌측 상단 화살표를 누르면 책상으로 돌아갑니다.
           </p>
         </>
       )}

@@ -15,9 +15,6 @@ export function ResumeViewer({ onClose }: { onClose: () => void }) {
       exit={{ opacity: 0 }}
       transition={{ duration: 0.2 }}
       className="fixed inset-0 z-[2147483647] flex items-center justify-center bg-slate-950/70 p-3 backdrop-blur-md sm:p-6"
-      onMouseDown={(event) => {
-        if (event.target === event.currentTarget) onClose();
-      }}
     >
       <motion.section
         initial={{ opacity: 0, y: 18, scale: 0.985 }}

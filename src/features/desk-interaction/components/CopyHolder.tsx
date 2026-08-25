@@ -19,7 +19,13 @@ const HOLDER_SCALE = 0.68;
 const DOCUMENT_POSITION: [number, number, number] = [0.035, 0.9, -0.041];
 const DOCUMENT_ROTATION: [number, number, number] = [-0.57, -0.62, -0.357];
 
-export function CopyHolder({ onSelect }: { onSelect: () => void }) {
+export function CopyHolder({
+  onSelect,
+  interactionDisabled = false,
+}: {
+  onSelect: () => void;
+  interactionDisabled?: boolean;
+}) {
   const [hovered, setHovered] = useState(false);
   const [frontFacing, setFrontFacing] = useState(true);
   const documentRef = useRef<Group>(null);
@@ -55,6 +61,7 @@ export function CopyHolder({ onSelect }: { onSelect: () => void }) {
 
   const openResume = (event: ThreeEvent<MouseEvent>) => {
     event.stopPropagation();
+    if (interactionDisabled) return;
     onSelect();
   };
 
@@ -90,7 +97,7 @@ export function CopyHolder({ onSelect }: { onSelect: () => void }) {
                 zoom: 2,
                 WebkitFontSmoothing: "antialiased",
                 backfaceVisibility: "hidden",
-                pointerEvents: "auto",
+                pointerEvents: interactionDisabled ? "none" : "auto",
               }}
             >
               <iframe
@@ -116,9 +123,11 @@ export function CopyHolder({ onSelect }: { onSelect: () => void }) {
                 aria-label="이력서 자세히 보기"
                 onClick={(event) => {
                   event.stopPropagation();
+                  if (interactionDisabled) return;
                   onSelect();
                 }}
                 onPointerEnter={() => {
+                  if (interactionDisabled) return;
                   setHovered(true);
                   document.body.style.cursor = "pointer";
                 }}
@@ -126,9 +135,12 @@ export function CopyHolder({ onSelect }: { onSelect: () => void }) {
                   setHovered(false);
                   document.body.style.cursor = "auto";
                 }}
-                onFocus={() => setHovered(true)}
+                onFocus={() => {
+                  if (!interactionDisabled) setHovered(true);
+                }}
                 onBlur={() => setHovered(false)}
-                className={`absolute inset-0 grid cursor-pointer place-items-center border-0 transition-colors duration-200 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-inset focus-visible:ring-sky-300 ${hovered ? "bg-slate-950/55" : "bg-transparent"}`}
+                disabled={interactionDisabled}
+                className={`absolute inset-0 grid place-items-center border-0 transition-colors duration-200 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-inset focus-visible:ring-sky-300 ${interactionDisabled ? "cursor-default" : "cursor-pointer"} ${hovered && !interactionDisabled ? "bg-slate-950/55" : "bg-transparent"}`}
               >
                 <LuEye
                   size={160}

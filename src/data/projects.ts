@@ -42,7 +42,44 @@ export const webProjects: PortfolioProject[] = [
   },
 ];
 
-export const appProjects: PortfolioProject[] = [
+export const duckRoutineProject: PortfolioProject = {
+  id: "duck-routine",
+  title: "Duck Routine",
+  subtitle: "작은 시작을 돕는 루틴",
+  projectType: "개인 프로젝트",
+  description:
+    "막막한 일을 아주 작은 행동 단위로 나누어 부담 없이 첫걸음을 뗄 수 있도록 돕는 앱입니다. 오늘 할 일을 일정으로 등록하고 단계별 타이머를 따라가며 하나씩 완료할 수 있습니다.",
+  technologies: ["Expo 54", "React Native 0.81", "TypeScript 5.9", "Expo Router", "AsyncStorage"],
+  features: [
+    {
+      title: "작은 단계의 루틴",
+      description: "기본 루틴을 활용하거나 나만의 루틴을 작은 행동 단위로 만들 수 있습니다.",
+    },
+    {
+      title: "일정과 반복 설정",
+      description: "날짜, 요일, 기간을 기준으로 일정을 계획하고 알림을 받을 수 있습니다.",
+    },
+    {
+      title: "단계별 진행 타이머",
+      description: "각 행동에 집중할 시간을 설정하고 루틴을 순서대로 이어갈 수 있습니다.",
+    },
+    {
+      title: "활동 기록",
+      description: "완료 횟수, 연속 일수, 누적 시간과 일별 활동 차트를 확인할 수 있습니다.",
+    },
+  ],
+  // TODO: Play Store 심사가 끝나면 실제 스토어 URL로 교체하세요.
+  href: "",
+  repositoryHref: "https://github.com/Gwontaejun/duck-routine",
+  image: "/app-project/duck-routine-icon.png",
+  accent: "#ff7a16",
+};
+
+// 포트폴리오에 노출되는 실제 앱 프로젝트 목록입니다.
+export const appProjects: PortfolioProject[] = [duckRoutineProject];
+
+// TODO: 데이터 구조 참고용 예시입니다. 실제 앱을 추가할 때 appProjects에 연결하세요.
+export const exampleAppProjects: PortfolioProject[] = [
   {
     id: "mori",
     title: "Mori",
