@@ -31,8 +31,9 @@
 
 ### 프로필
 
-- 책상 왼쪽의 `paper-holder.glb` 카피홀더에 Notion 이력서 임베드를 표시한다.
-- 공개 링크와 임베드 링크는 `src/features/desk-interaction/model/resume.ts`에서 관리한다.
+- 책상 왼쪽의 `paper-holder.glb` 카피홀더에 로컬 이력서 첫 페이지 이미지를 표시한다.
+- 이력서 원본은 `public/pdf/profile.pdf`, 미리보기는 `public/pdf/profile-page-1.png`를 사용한다.
+- PDF 공개 경로는 `src/features/desk-interaction/model/resume.ts`에서 관리한다.
 - 클릭하면 별도의 프로필 상세 뷰가 부드럽게 열리고 닫힌다.
 
 ## 상호작용 상태
@@ -69,17 +70,20 @@
 - `src/features/desk-interaction/components/DeskScene.tsx`: 장면, 카메라, 포커스 상태
 - `src/features/desk-interaction/components/Monitor.tsx`: 모니터 화면과 웹 프로젝트 UI
 - `src/features/desk-interaction/components/Phone.tsx`: 휴대폰 홈과 앱 상세 UI
-- `src/features/desk-interaction/components/CopyHolder.tsx`: 책상 위 프로필 임베드
+- `src/features/desk-interaction/components/CopyHolder.tsx`: 책상 위 프로필 미리보기
 - `src/features/desk-interaction/components/ResumeViewer.tsx`: 프로필 상세 화면
 - `src/features/desk-interaction/components/RoomEnvironment.tsx`: 방과 창문, 비 효과
 - `src/features/desk-interaction/model/scene.ts`: 기본 카메라와 책상 기준값
 - `src/data/projects.ts`: 실제 프로젝트 콘텐츠와 링크
 
-## 현재 작업 트리 주의사항
+## 렌더링 및 리소스 상태
 
-- `src/features/desk-interaction/components/Phone.tsx`에 아직 커밋되지 않은 Android 하단 탐색 수정이 있다. 오른쪽 삼각형이 뒤로가기이고, 전체 탐색 바가 아니라 각 버튼이 개별 동작하도록 변경된 상태다.
-- 이 파일의 사용자 변경을 되돌리지 말고 검증 후 함께 커밋해야 한다.
-- `tsconfig.tsbuildinfo`는 생성 캐시다. 이후 변경은 무시되도록 `.gitignore`에 등록했지만, 이미 Git에 추적 중이라면 별도로 인덱스에서 제거해야 한다.
+- Canvas는 DPR 1, 비활성화된 안티앨리어싱, demand 렌더 루프를 사용한다.
+- 창문의 비 셰이더가 활성화된 동안에는 애니메이션을 위해 매 프레임 렌더링한다.
+- 키보드는 `low-poly-keyboard.glb`를 사용하고 그림자를 생성하지 않는다.
+- 장패드는 별도 GLB 대신 `DeskAccessories.tsx`의 라운드 도형으로 생성한다.
+- 모니터·휴대폰·프로필 화면은 Drei `Html`을 사용하며 정면에서만 보이도록 처리한다.
+- 휴대폰 이동 프레임은 HTML 좌표 계산보다 먼저 실행하고 월드 행렬을 즉시 갱신한다.
 
 ## 다음 후보 작업
 
@@ -87,7 +91,7 @@
 - 방명록 UX 결정: 모니터 앱으로 넣을지 실제 책상 위 노트 오브젝트로 만들지 미정
 - 휴대폰 실기기 및 좁은 브라우저 화면에서 텍스트 크기와 스크롤 최종 검증
 - 3D 장면과 `Html` 오버레이가 앞뒤에서 올바르게 가려지는지 회귀 검증
-- 실제 배포 환경에서 Notion iframe 허용 여부 확인
+- 휴대폰 이동 중 모델과 `Html` 화면의 동기화 상태를 다양한 프레임률에서 검증
 
 ## 새 환경 체크리스트
 

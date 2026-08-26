@@ -1,13 +1,13 @@
 "use client";
 
 import { useRef, useState } from "react";
+import Image from "next/image";
 import { Html, useGLTF } from "@react-three/drei";
 import { useFrame, type ThreeEvent } from "@react-three/fiber";
 import { LuEye } from "react-icons/lu";
 import { Group, Quaternion, Vector3 } from "three";
 import { ModelAsset } from "./ModelAsset";
 import { DESK_TOP_Y } from "../model/scene";
-import { RESUME_EMBED_URL } from "../model/resume";
 
 const PAPER_HOLDER_MODEL = "/3d-models/paper-holder.glb";
 const HOLDER_CAMERA_YAW = 1.3;
@@ -15,7 +15,7 @@ const HOLDER_FORWARD_TILT = 0.068;
 const HOLDER_SIDE_TILT = 0.06;
 const HOLDER_SCALE = 0.68;
 
-// paper-holder 모델의 정면 축에 iframe을 맞추고 홈 안쪽 깊이에 배치합니다.
+// paper-holder 모델의 정면 축에 이력서 미리보기를 맞추고 홈 안쪽 깊이에 배치합니다.
 const DOCUMENT_POSITION: [number, number, number] = [0.035, 0.9, -0.041];
 const DOCUMENT_ROTATION: [number, number, number] = [-0.57, -0.62, -0.357];
 
@@ -83,10 +83,11 @@ export function CopyHolder({
           <Html
             center
             transform
-            distanceFactor={0.38}
+            distanceFactor={0.76 / 1.5}
             style={{
               pointerEvents: "none",
               display: frontFacing ? "block" : "none",
+              contain: "layout paint style",
               backfaceVisibility: "hidden",
               WebkitBackfaceVisibility: "hidden",
             }}
@@ -94,29 +95,20 @@ export function CopyHolder({
             <div
               className="relative h-[780px] w-[600px] overflow-hidden rounded-[8px] bg-white"
               style={{
-                zoom: 2,
+                zoom: 1.5,
                 WebkitFontSmoothing: "antialiased",
                 backfaceVisibility: "hidden",
                 pointerEvents: interactionDisabled ? "none" : "auto",
               }}
             >
-              <iframe
-                src={RESUME_EMBED_URL}
-                title="권태준 Notion 이력서 미리보기"
-                className="absolute left-0 border-0 bg-white"
-                style={{
-                  colorScheme: "light",
-                  top: "-24px",
-                  width: "1152px",
-                  height: "1590px",
-                  transform: "scale(0.6)",
-                  transformOrigin: "top left",
-                  filter: "brightness(0.88) saturate(0.94)",
-                }}
-                loading="eager"
-                tabIndex={-1}
-                aria-hidden="true"
-                referrerPolicy="strict-origin-when-cross-origin"
+              <Image
+                src="/pdf/profile-page-1.png"
+                alt="권태준 이력서 첫 페이지"
+                fill
+                priority
+                unoptimized
+                sizes="600px"
+                className="object-contain"
               />
               <button
                 type="button"

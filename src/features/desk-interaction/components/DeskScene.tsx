@@ -41,6 +41,7 @@ function Workspace({
   onOpenResume: () => void;
 }) {
   const camera = useThree((state) => state.camera);
+  const invalidate = useThree((state) => state.invalidate);
   const controlsRef = useRef<OrbitControlsImpl>(null);
   const cameraTransitioning = useRef(false);
 
@@ -48,6 +49,7 @@ function Workspace({
   const defaultTarget = useRef(new Vector3(...CAMERA_TARGET));
   const monitorPosition = useRef(new Vector3(0, 2.08, 1.2));
   const monitorTarget = useRef(new Vector3(0, 2.1, -0.5));
+
   useFrame((_, delta) => {
     if (monitorFocused) cameraTransitioning.current = true;
 
@@ -70,21 +72,26 @@ function Workspace({
     controls?.target.lerp(target, easing);
     camera.lookAt(controls?.target ?? target);
 
-    if (
-      !monitorFocused &&
-      !phoneFocused &&
-      camera.position.distanceToSquared(defaultPosition.current) < 0.0001 &&
-      (!controls ||
-        controls.target.distanceToSquared(defaultTarget.current) < 0.0001)
-    ) {
-      camera.position.copy(defaultPosition.current);
-      controls?.target.copy(defaultTarget.current);
-      cameraTransitioning.current = false;
-      if (controls) {
-        controls.enabled = cameraControlsEnabled;
-        controls.update();
+    const transitionSettled =
+      camera.position.distanceToSquared(position) < 0.0001 &&
+      (!controls || controls.target.distanceToSquared(target) < 0.0001);
+
+    if (transitionSettled) {
+      camera.position.copy(position);
+      controls?.target.copy(target);
+      camera.lookAt(target);
+
+      if (!monitorFocused && !phoneFocused) {
+        cameraTransitioning.current = false;
+        if (controls) {
+          controls.enabled = cameraControlsEnabled;
+          controls.update();
+        }
       }
+      return;
     }
+
+    invalidate();
   });
 
   return (
@@ -104,7 +111,7 @@ function Workspace({
         intensity={0.9}
         distance={8}
       />
-      <Environment resolution={128}>
+      <Environment resolution={64}>
         <Lightformer
           intensity={1.2}
           color="#d8e1ec"
@@ -159,6 +166,7 @@ function Workspace({
         blur={2.2}
         far={4.5}
         color="#050608"
+        frames={1}
       />
       <OrbitControls
         ref={controlsRef}
@@ -184,6 +192,7 @@ function Workspace({
     </>
   );
 }
+useGLTF.preload("/3d-models/computer-desk.glb");
 
 function SceneBranding({ hidden, onReveal }: { hidden: boolean; onReveal: () => void }) {
   const { active, progress } = useProgress();
@@ -230,7 +239,7 @@ function SceneBranding({ hidden, onReveal }: { hidden: boolean; onReveal: () => 
             initial={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: reduceMotion ? 0.1 : 0.7, ease: "easeInOut" }}
-            className="pointer-events-none absolute inset-0 z-50 grid place-items-center bg-[radial-gradient(circle_at_50%_42%,#18202a_0%,#0b0e13_48%,#06080b_100%)] text-white"
+            className="pointer-events-none absolute inset-0 z-[20000000] grid place-items-center bg-[radial-gradient(circle_at_50%_42%,#18202a_0%,#0b0e13_48%,#06080b_100%)] text-white"
           >
             <motion.div
               initial={reduceMotion ? false : { opacity: 0, y: 12 }}
@@ -283,7 +292,7 @@ function SceneBranding({ hidden, onReveal }: { hidden: boolean; onReveal: () => 
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -6 }}
             transition={{ duration: reduceMotion ? 0.1 : 0.4 }}
-            className="pointer-events-none absolute left-5 top-5 z-20 text-center text-white sm:left-8 sm:top-8"
+            className="pointer-events-none absolute left-5 top-5 z-[20000000] text-center text-white sm:left-8 sm:top-8"
           >
             <p className="text-[38px] font-semibold leading-none tracking-[-0.06em]">J00N</p>
             <p className="mt-[5px] text-[7px] tracking-[0.52em] text-white/42">PORTFOLIO</p>
@@ -335,10 +344,15 @@ export function DeskScene({
   return (
     <div className="relative h-full w-full bg-[radial-gradient(circle_at_50%_32%,#252c38_0%,#101319_48%,#080a0e_100%)]">
       <Canvas
-        dpr={[1, 2]}
+        frameloop="demand"
+        dpr={1}
         shadows
         camera={{ position: CAMERA_POSITION, fov: 41 }}
-        gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
+        gl={{ antialias: false, alpha: true, powerPreference: "high-performance" }}
+        onCreated={({ gl }) => {
+          gl.shadowMap.autoUpdate = false;
+          gl.shadowMap.needsUpdate = true;
+        }}
         style={{
           opacity: sceneVisible ? 1 : 0,
           transition: `opacity ${sceneVisible ? 500 : 0}ms ease-out`,
@@ -396,5 +410,3 @@ export function DeskScene({
     </div>
   );
 }
-
-useGLTF.preload("/3d-models/computer-desk.glb");

@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useState, type KeyboardEvent, type MouseEvent } from "react";
+import { useRef, useState, type KeyboardEvent, type MouseEvent } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import type { IconType } from "react-icons";
 import {
@@ -28,6 +28,8 @@ import {
   SiTypescript,
 } from "react-icons/si";
 import { Html, useGLTF } from "@react-three/drei";
+import { useFrame, useThree } from "@react-three/fiber";
+import { Group, Quaternion, Vector3 } from "three";
 import { ModelAsset } from "./ModelAsset";
 import { webProjects } from "@/data/projects";
 import { useCurrentDateTime } from "@/shared/hooks/useCurrentDateTime";
@@ -70,7 +72,19 @@ type MonitorProps = {
   onClick: () => void;
 };
 
-export function Monitor({ focused, foregroundObjectActive = false, onClick }: MonitorProps) {
+export function Monitor({
+  focused,
+  foregroundObjectActive = false,
+  onClick,
+}: MonitorProps) {
+  const camera = useThree((state) => state.camera);
+  const [frontFacing, setFrontFacing] = useState(true);
+  const frontFacingRef = useRef(true);
+  const monitorRef = useRef<Group>(null);
+  const worldPosition = useRef(new Vector3());
+  const worldQuaternion = useRef(new Quaternion());
+  const screenNormal = useRef(new Vector3());
+  const cameraDirection = useRef(new Vector3());
   const currentDateTime = useCurrentDateTime();
   const [selectedProjectId, setSelectedProjectId] = useState(
     webProjects[0]?.id ?? "",
@@ -122,8 +136,27 @@ export function Monitor({ focused, foregroundObjectActive = false, onClick }: Mo
     if (!focused) onClick();
   };
 
+  useFrame(() => {
+    const monitor = monitorRef.current;
+    if (!monitor) return;
+
+    monitor.getWorldPosition(worldPosition.current);
+    monitor.getWorldQuaternion(worldQuaternion.current);
+    screenNormal.current.set(0, 0, 1).applyQuaternion(worldQuaternion.current);
+    cameraDirection.current
+      .copy(camera.position)
+      .sub(worldPosition.current)
+      .normalize();
+
+    const nextFrontFacing = screenNormal.current.dot(cameraDirection.current) > 0;
+    if (nextFrontFacing === frontFacingRef.current) return;
+
+    frontFacingRef.current = nextFrontFacing;
+    setFrontFacing(nextFrontFacing);
+  });
+
   return (
-    <group position={[0, DESK_TOP_Y, -0.88]}>
+    <group ref={monitorRef} position={[0, DESK_TOP_Y, -0.88]}>
       <ModelAsset path={MONITOR_MODEL} size={2.45} />
       <mesh position={[0, 1.04, 0.102]} renderOrder={2}>
         <planeGeometry args={[2.4, 1.22]} />
@@ -132,13 +165,15 @@ export function Monitor({ focused, foregroundObjectActive = false, onClick }: Mo
       <Html
         center
         transform
-        occlude={foregroundObjectActive ? "blending" : true}
+        occlude="blending"
         position={[0, 1.04, 0.104]}
         distanceFactor={0.5}
         style={{
           pointerEvents: foregroundObjectActive ? "none" : "auto",
+          display: frontFacing ? "block" : "none",
+          contain: "layout paint style",
           backgroundColor: "#0b74c9",
-          borderRadius: "28px",
+          borderRadius: "0px",
           overflow: "hidden",
           willChange: "transform",
           backfaceVisibility: "hidden",
@@ -159,7 +194,7 @@ export function Monitor({ focused, foregroundObjectActive = false, onClick }: Mo
             backfaceVisibility: "hidden",
             WebkitBackfaceVisibility: "hidden",
           }}
-          className={`group relative h-[488px] w-[960px] overflow-hidden rounded-[12px] border-0 bg-[#0b74c9] text-left text-[#172033] shadow-2xl outline-none transition duration-300 ${focused ? "cursor-default" : "cursor-pointer hover:ring-2 hover:ring-inset hover:ring-sky-500/35 focus-visible:ring-4 focus-visible:ring-inset focus-visible:ring-sky-500/70"}`}
+          className={`group relative h-[488px] w-[960px] overflow-hidden rounded-none border-0 bg-[#0b74c9] text-left text-[#172033] shadow-lg outline-none transition-shadow duration-300 ${focused ? "cursor-default" : "cursor-pointer hover:ring-2 hover:ring-inset hover:ring-sky-500/35 focus-visible:ring-4 focus-visible:ring-inset focus-visible:ring-sky-500/70"}`}
         >
           <div
             className={`absolute inset-0 ${focused ? "pointer-events-auto" : "pointer-events-none"}`}
@@ -184,7 +219,7 @@ export function Monitor({ focused, foregroundObjectActive = false, onClick }: Mo
                   event.stopPropagation();
                   setProjectWindowOpen(false);
                 }}
-                className="absolute right-7 top-0 z-10 grid size-7 place-items-center text-white/80 transition hover:bg-white/15 hover:text-white focus-visible:bg-white/15 focus-visible:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-sky-400"
+                className="absolute right-9 top-0 z-10 grid size-7 place-items-center text-white/80 transition hover:bg-white/15 hover:text-white focus-visible:bg-white/15 focus-visible:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-sky-400"
               >
                 <span className="h-px w-3 bg-current" aria-hidden="true" />
               </button>
@@ -196,7 +231,7 @@ export function Monitor({ focused, foregroundObjectActive = false, onClick }: Mo
                   setProjectWindowOpen(false);
                   setProjectWindowRunning(false);
                 }}
-                className="absolute right-0 top-0 z-10 grid size-7 place-items-center text-[13px] text-white/80 transition hover:bg-[#e81123] hover:text-white focus-visible:bg-[#e81123] focus-visible:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-white"
+                className="absolute right-2 top-0 z-10 grid size-7 place-items-center text-[13px] text-white/80 transition hover:bg-[#e81123] hover:text-white focus-visible:bg-[#e81123] focus-visible:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-white"
               >
                 ×
               </button>
@@ -331,7 +366,7 @@ export function Monitor({ focused, foregroundObjectActive = false, onClick }: Mo
               className="relative h-full overflow-hidden bg-[linear-gradient(135deg,#0b74c9_0%,#168bd4_42%,#67b9e5_100%)]"
             >
               <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_76%_42%,rgba(255,255,255,.26),transparent_32%)]" />
-              <div className="pointer-events-none absolute right-[19%] top-[17%] grid h-56 w-56 grid-cols-2 gap-1.5 opacity-75 [filter:drop-shadow(0_0_34px_rgba(255,255,255,.28))] [transform:perspective(420px)_rotateY(-8deg)]">
+              <div className="pointer-events-none absolute right-[19%] top-[17%] grid h-56 w-56 grid-cols-2 gap-1.5 opacity-75 [transform:perspective(420px)_rotateY(-8deg)]">
                 <span className="bg-white/45" />
                 <span className="bg-white/35" />
                 <span className="bg-white/35" />
@@ -340,7 +375,7 @@ export function Monitor({ focused, foregroundObjectActive = false, onClick }: Mo
               <div className="pointer-events-none absolute inset-y-0 right-0 w-2/3 bg-[linear-gradient(90deg,transparent,rgba(255,255,255,.08))]" />
               <section
                 aria-label="프로젝트 둘러보기 안내"
-                className="pointer-events-none absolute left-1/2 top-[47%] w-[390px] -translate-x-1/2 -translate-y-1/2 rounded-2xl border border-white/15 bg-[#07345c]/55 px-6 py-5 text-white shadow-[0_22px_65px_rgba(2,20,38,.24)] backdrop-blur-md"
+                className="pointer-events-none absolute left-1/2 top-[47%] w-[390px] -translate-x-1/2 -translate-y-1/2 rounded-2xl border border-white/15 bg-[#07345c]/90 px-6 py-5 text-white shadow-md"
               >
                 <p className="text-[17px] font-semibold tracking-[-.025em]">
                   프로젝트 둘러보기
@@ -421,7 +456,11 @@ export function Monitor({ focused, foregroundObjectActive = false, onClick }: Mo
           )}
           </AnimatePresence>
           <div
-            className="absolute inset-x-0 bottom-0 z-20 flex h-[24px] items-center bg-[#101010]/96 text-white shadow-[0_-1px_0_rgba(255,255,255,.08)]"
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-x-0 bottom-0 z-[19] h-[4px] bg-[#101010]/96"
+          />
+          <div
+            className="absolute inset-x-0 bottom-[4px] z-20 flex h-[24px] items-center bg-[#101010]/96 px-2 text-white shadow-[0_-1px_0_rgba(255,255,255,.08)]"
             aria-label="Windows 10 스타일 작업표시줄"
           >
             <span

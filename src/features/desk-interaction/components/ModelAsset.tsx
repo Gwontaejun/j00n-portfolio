@@ -11,10 +11,18 @@ type ModelAssetProps = {
   dimMaterial?: string;
   dimmed?: boolean;
   dimStrength?: number;
+  castShadow?: boolean;
 };
 
 /** 원본 GLB의 단위와 중심점이 달라도 동일한 씬 단위로 맞춥니다. */
-export function ModelAsset({ path, size, dimMaterial, dimmed = false, dimStrength = 0.4 }: ModelAssetProps) {
+export function ModelAsset({
+  path,
+  size,
+  dimMaterial,
+  dimmed = false,
+  dimStrength = 0.4,
+  castShadow = true,
+}: ModelAssetProps) {
   const { scene } = useGLTF(path);
   const maxAnisotropy = useThree((state) => state.gl.capabilities.getMaxAnisotropy());
 
@@ -22,7 +30,7 @@ export function ModelAsset({ path, size, dimMaterial, dimmed = false, dimStrengt
     const model = scene.clone(true);
     model.traverse((child) => {
       if (child instanceof Mesh) {
-        child.castShadow = true;
+        child.castShadow = castShadow;
         child.receiveShadow = true;
 
         const materials = Array.isArray(child.material) ? child.material : [child.material];
@@ -38,7 +46,7 @@ export function ModelAsset({ path, size, dimMaterial, dimmed = false, dimStrengt
 
           Object.values(nextMaterial).forEach((value) => {
             if (value instanceof Texture) {
-              value.anisotropy = maxAnisotropy;
+              value.anisotropy = Math.min(maxAnisotropy, 4);
               value.needsUpdate = true;
             }
           });
@@ -59,7 +67,7 @@ export function ModelAsset({ path, size, dimMaterial, dimmed = false, dimStrengt
       scale: size / longestSide,
       offset: new Vector3(-center.x, -bounds.min.y, -center.z),
     };
-  }, [maxAnisotropy, scene, size]);
+  }, [castShadow, maxAnisotropy, scene, size]);
 
   useEffect(() => {
     if (!dimMaterial) return;

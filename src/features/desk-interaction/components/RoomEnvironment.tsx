@@ -74,8 +74,9 @@ const rainFragmentShader = /* glsl */ `
 function WindowRain() {
   const materialRef = useRef<ShaderMaterial>(null);
 
-  useFrame(({ clock }) => {
+  useFrame(({ clock, invalidate }) => {
     if (materialRef.current) materialRef.current.uniforms.uTime.value = clock.elapsedTime;
+    invalidate();
   });
 
   return (

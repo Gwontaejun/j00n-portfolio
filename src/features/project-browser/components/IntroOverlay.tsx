@@ -12,7 +12,7 @@ export function IntroOverlay({ cameraControlsEnabled, hidden, onToggleCamera }: 
   if (hidden) return null;
 
   return (
-    <div className="pointer-events-none absolute right-0 top-0 z-10 p-5 sm:p-8">
+    <div className="pointer-events-none absolute right-0 top-0 z-[16777272] p-5 sm:p-8">
       <div className="pointer-events-auto flex gap-2">
         <button
           type="button"

@@ -40,11 +40,17 @@ const DUCK_FEATURE_COLORS = [
   "bg-violet-400/10 text-violet-300",
 ];
 
-export function Phone({ focused, interactionDisabled = false, onFocus, onSelect }: PhoneProps) {
+export function Phone({
+  focused,
+  interactionDisabled = false,
+  onFocus,
+  onSelect,
+}: PhoneProps) {
   const [hovered, setHovered] = useState(false);
   const [activeScreen, setActiveScreen] = useState<"home" | "duck-routine">("home");
   const currentDateTime = useCurrentDateTime();
   const camera = useThree((state) => state.camera);
+  const invalidate = useThree((state) => state.invalidate);
   const rootRef = useRef<Group>(null);
   const phoneRef = useRef<Group>(null);
   const cameraDirection = useRef(new Vector3());
@@ -57,12 +63,17 @@ export function Phone({ focused, interactionDisabled = false, onFocus, onSelect 
   const restingPosition = useRef(new Vector3(0, 0.51, -0.02));
   const rotationMatrix = useRef(new Matrix4());
   const rootWorldQuaternion = useRef(new Quaternion());
+  const phoneWorldPosition = useRef(new Vector3());
+  const phoneWorldQuaternion = useRef(new Quaternion());
+  const phoneScreenNormal = useRef(new Vector3());
+  const phoneCameraDirection = useRef(new Vector3());
+  const [frontFacing, setFrontFacing] = useState(true);
+  const frontFacingRef = useRef(true);
   const targetWorldQuaternion = useRef(new Quaternion());
   const targetLocalQuaternion = useRef(new Quaternion());
   const restingQuaternion = useRef(
     new Quaternion().setFromEuler(new Euler(0.95, 0, 0)),
   );
-
   useFrame((_, delta) => {
     const root = rootRef.current;
     const phone = phoneRef.current;
@@ -111,7 +122,43 @@ export function Phone({ focused, interactionDisabled = false, onFocus, onSelect 
     const nextScale = phone.scale.x + (targetScale - phone.scale.x) * easing;
     phone.scale.setScalar(nextScale);
     phone.quaternion.slerp(targetLocalQuaternion.current, easing);
-  });
+
+    // Drei의 Html이 같은 프레임에서 갱신된 휴대폰 행렬을 읽도록 먼저 확정한다.
+    // 그렇지 않으면 빠르게 이동할 때 DOM 화면이 한 프레임 전 위치에 남아
+    // WebGL 휴대폰 모델의 테두리 밖으로 밀려 보일 수 있다.
+    phone.updateWorldMatrix(true, true);
+
+    phone.getWorldPosition(phoneWorldPosition.current);
+    phone.getWorldQuaternion(phoneWorldQuaternion.current);
+    phoneScreenNormal.current
+      .set(0, 1, 0)
+      .applyQuaternion(phoneWorldQuaternion.current);
+    phoneCameraDirection.current
+      .copy(camera.position)
+      .sub(phoneWorldPosition.current)
+      .normalize();
+
+    const nextFrontFacing =
+      phoneScreenNormal.current.dot(phoneCameraDirection.current) > 0;
+    if (nextFrontFacing !== frontFacingRef.current) {
+      frontFacingRef.current = nextFrontFacing;
+      setFrontFacing(nextFrontFacing);
+    }
+
+    const transitionSettled =
+      phone.position.distanceToSquared(targetPosition.current) < 0.000001 &&
+      Math.abs(phone.scale.x - targetScale) < 0.0001 &&
+      phone.quaternion.angleTo(targetLocalQuaternion.current) < 0.0001;
+
+    if (transitionSettled) {
+      phone.position.copy(targetPosition.current);
+      phone.scale.setScalar(targetScale);
+      phone.quaternion.copy(targetLocalQuaternion.current);
+      return;
+    }
+
+    invalidate();
+  }, -1);
 
   return (
     <group
@@ -144,12 +191,13 @@ export function Phone({ focused, interactionDisabled = false, onFocus, onSelect 
         <Html
           center
           transform
-          occlude
           position={[0, 0.034, 0.004]}
           rotation={[-Math.PI / 2, 0, 0]}
-          distanceFactor={0.185}
+          distanceFactor={0.37}
           style={{
             pointerEvents: interactionDisabled ? "none" : "auto",
+            display: frontFacing ? "block" : "none",
+            contain: "layout paint style",
             backfaceVisibility: "hidden",
             WebkitBackfaceVisibility: "hidden",
           }}
@@ -188,17 +236,16 @@ export function Phone({ focused, interactionDisabled = false, onFocus, onSelect 
             }}
             onBlur={() => setHovered(false)}
             style={{
-              zoom: 4,
+              zoom: 2,
               WebkitFontSmoothing: "antialiased",
-              textRendering: "geometricPrecision",
               backfaceVisibility: "hidden",
               WebkitBackfaceVisibility: "hidden",
             }}
-            className={`relative flex h-[384px] w-[176px] flex-col overflow-hidden rounded-[22px] border border-white/[.07] bg-[#111318] px-3 pb-2 pt-2 text-white shadow-2xl outline-none ${focused ? "cursor-default" : "cursor-pointer"}`}
+            className={`relative flex h-[384px] w-[176px] flex-col overflow-hidden rounded-[10px] border border-white/[.07] bg-[#111318] px-3 pb-2 pt-2 text-white outline-none ${focused ? "cursor-default" : "cursor-pointer"}`}
           >
             <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
-              <span className="absolute -right-10 top-7 h-36 w-28 rotate-[28deg] rounded-[45%] bg-[#ff8a3d]/10 blur-xl" />
-              <span className="absolute -left-12 top-40 h-32 w-28 -rotate-[18deg] rounded-[42%] bg-[#d9b29a]/6 blur-xl" />
+              <span className="absolute -right-10 top-7 h-36 w-28 rotate-[28deg] rounded-[45%] bg-[#ff8a3d]/10 blur-md" />
+              <span className="absolute -left-12 top-40 h-32 w-28 -rotate-[18deg] rounded-[42%] bg-[#d9b29a]/6 blur-md" />
             </div>
 
             <div className="relative z-10 flex h-4 items-center justify-between px-1 text-[7px] font-medium text-white/85">
@@ -335,7 +382,7 @@ export function Phone({ focused, interactionDisabled = false, onFocus, onSelect 
               <span className="flex-1 text-left text-[7px]">검색</span>
               <LuMic size={10} aria-hidden="true" />
             </div>
-            <div className="relative z-10 -mx-3 -mb-2 mt-auto flex h-7 shrink-0 items-center justify-around border-t border-white/[.04] bg-[#0d0f15]/92 px-8 text-white/75 backdrop-blur-md">
+            <div className="relative z-10 -mx-3 -mb-2 mt-auto flex h-7 shrink-0 items-center justify-around border-t border-white/[.04] bg-[#0d0f15] px-8 text-white/75">
               <button
                 type="button"
                 aria-label="최근 앱"
