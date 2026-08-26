@@ -4,7 +4,11 @@ import dynamic from 'next/dynamic';
 import { useCallback, useEffect, useState } from 'react';
 import { IntroOverlay } from '@/features/project-browser/components/IntroOverlay';
 import { ProjectPanel } from '@/features/project-browser/components/ProjectPanel';
+import { SceneGuide } from '@/features/project-browser/components/SceneGuide';
 import type { ProjectCategory } from '@/types/project';
+import type { SceneGuideTarget } from '@/types/scene-guide';
+
+const GUIDE_TARGETS: SceneGuideTarget[] = ['monitor', 'phone', 'profile', 'guestbook'];
 
 const DeskScene = dynamic(
   () => import('@/features/desk-interaction/components/DeskScene').then((module) => module.DeskScene),
@@ -20,6 +24,8 @@ export default function Home() {
   const [cameraControlsEnabled, setCameraControlsEnabled] = useState(false);
   const [isMonitorFocused, setIsMonitorFocused] = useState(false);
   const [isSceneReady, setIsSceneReady] = useState(false);
+  const [isGuideOpen, setIsGuideOpen] = useState(false);
+  const [guideStepIndex, setGuideStepIndex] = useState(0);
 
   const openProjects = useCallback((category: ProjectCategory, projectId?: string) => {
     setSelectedProjectId(projectId ?? null);
@@ -39,6 +45,21 @@ export default function Home() {
     return () => window.removeEventListener('keydown', onKeyDown);
   }, [closePanel]);
 
+  const closeGuide = useCallback(() => {
+    setIsGuideOpen(false);
+  }, []);
+
+  const openGuide = useCallback(() => {
+    setGuideStepIndex(0);
+    setIsGuideOpen(true);
+  }, []);
+
+  const handleSceneReady = useCallback(() => {
+    setIsSceneReady(true);
+    setGuideStepIndex(0);
+    setIsGuideOpen(true);
+  }, []);
+
   return (
     <main className="relative min-h-dvh overflow-hidden bg-[#11141a] text-white">
       <section aria-label="3D 작업 책상" className="absolute inset-0">
@@ -46,11 +67,13 @@ export default function Home() {
           onSelect={openProjects}
           cameraControlsEnabled={cameraControlsEnabled}
           onMonitorFocusChange={setIsMonitorFocused}
-          onSceneReady={() => setIsSceneReady(true)}
+          onSceneReady={handleSceneReady}
+          guideTarget={isGuideOpen ? GUIDE_TARGETS[guideStepIndex] : null}
         />
       </section>
-      <IntroOverlay cameraControlsEnabled={cameraControlsEnabled} hidden={!isSceneReady || isMonitorFocused} onToggleCamera={() => setCameraControlsEnabled((enabled) => !enabled)} />
+      <IntroOverlay cameraControlsEnabled={cameraControlsEnabled} hidden={!isSceneReady || isMonitorFocused} onToggleCamera={() => setCameraControlsEnabled((enabled) => !enabled)} onOpenGuide={openGuide} />
       <ProjectPanel category={activeCategory} selectedProjectId={selectedProjectId} onClose={closePanel} />
+      <SceneGuide open={isGuideOpen} stepIndex={guideStepIndex} onStepChange={setGuideStepIndex} onClose={closeGuide} />
     </main>
   );
 }

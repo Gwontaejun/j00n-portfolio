@@ -34,6 +34,7 @@ import { ModelAsset } from "./ModelAsset";
 import { webProjects } from "@/data/projects";
 import { useCurrentDateTime } from "@/shared/hooks/useCurrentDateTime";
 import { DESK_TOP_Y } from "../model/scene";
+import { useGuideHighlight } from "../hooks/useGuideHighlight";
 
 const MONITOR_MODEL = "/3d-models/monitor.glb";
 
@@ -69,12 +70,16 @@ function SkillBadge({ name }: { name: string }) {
 type MonitorProps = {
   focused: boolean;
   foregroundObjectActive?: boolean;
+  guideHighlighted?: boolean;
+  guideDimmed?: boolean;
   onClick: () => void;
 };
 
 export function Monitor({
   focused,
   foregroundObjectActive = false,
+  guideHighlighted = false,
+  guideDimmed = false,
   onClick,
 }: MonitorProps) {
   const camera = useThree((state) => state.camera);
@@ -92,6 +97,7 @@ export function Monitor({
   const [searchQuery, setSearchQuery] = useState("");
   const [projectWindowOpen, setProjectWindowOpen] = useState(false);
   const [projectWindowRunning, setProjectWindowRunning] = useState(false);
+  useGuideHighlight(monitorRef, guideHighlighted);
   const selectedProject =
     webProjects.find((project) => project.id === selectedProjectId) ??
     webProjects[0];
@@ -158,6 +164,21 @@ export function Monitor({
   return (
     <group ref={monitorRef} position={[0, DESK_TOP_Y, -0.88]}>
       <ModelAsset path={MONITOR_MODEL} size={2.45} />
+      <rectAreaLight
+        position={[0, 1.02, 0.15]}
+        rotation={[0, Math.PI, 0]}
+        width={2.55}
+        height={1.05}
+        color="#78c4ff"
+        intensity={1.35}
+      />
+      <pointLight
+        position={[1.05, 0.92, 0.28]}
+        color="#9bd3ff"
+        intensity={0.38}
+        distance={2.6}
+        decay={2}
+      />
       <mesh position={[0, 1.04, 0.102]} renderOrder={2}>
         <planeGeometry args={[2.4, 1.22]} />
         <meshBasicMaterial color="#0b74c9" toneMapped={false} />
@@ -178,6 +199,8 @@ export function Monitor({
           willChange: "transform",
           backfaceVisibility: "hidden",
           WebkitBackfaceVisibility: "hidden",
+          filter: guideDimmed ? "brightness(0.32)" : "none",
+          transition: "filter 220ms ease",
         }}
       >
         <div

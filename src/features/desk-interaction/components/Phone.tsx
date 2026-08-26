@@ -24,10 +24,13 @@ import { ModelAsset } from "./ModelAsset";
 import { DESK_TOP_Y } from "../model/scene";
 import { useCurrentDateTime } from "@/shared/hooks/useCurrentDateTime";
 import { duckRoutineProject } from "@/data/projects";
+import { useGuideHighlight } from "../hooks/useGuideHighlight";
 
 type PhoneProps = {
   focused: boolean;
   interactionDisabled?: boolean;
+  guideHighlighted?: boolean;
+  guideDimmed?: boolean;
   onFocus: () => void;
   onSelect: (projectId?: string) => void;
 };
@@ -43,6 +46,8 @@ const DUCK_FEATURE_COLORS = [
 export function Phone({
   focused,
   interactionDisabled = false,
+  guideHighlighted = false,
+  guideDimmed = false,
   onFocus,
   onSelect,
 }: PhoneProps) {
@@ -74,6 +79,7 @@ export function Phone({
   const restingQuaternion = useRef(
     new Quaternion().setFromEuler(new Euler(0.95, 0, 0)),
   );
+  useGuideHighlight(rootRef, guideHighlighted);
   useFrame((_, delta) => {
     const root = rootRef.current;
     const phone = phoneRef.current;
@@ -200,6 +206,8 @@ export function Phone({
             contain: "layout paint style",
             backfaceVisibility: "hidden",
             WebkitBackfaceVisibility: "hidden",
+            filter: guideDimmed ? "brightness(0.32)" : "none",
+            transition: "filter 220ms ease",
           }}
         >
           <div
