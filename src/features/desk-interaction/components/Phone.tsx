@@ -199,7 +199,7 @@ export function Phone({
           transform
           position={[0, 0.034, 0.004]}
           rotation={[-Math.PI / 2, 0, 0]}
-          distanceFactor={0.37}
+          distanceFactor={0.247}
           style={{
             pointerEvents: interactionDisabled ? "none" : "auto",
             display: frontFacing ? "block" : "none",
@@ -244,7 +244,7 @@ export function Phone({
             }}
             onBlur={() => setHovered(false)}
             style={{
-              zoom: 2,
+              zoom: 3,
               WebkitFontSmoothing: "antialiased",
               backfaceVisibility: "hidden",
               WebkitBackfaceVisibility: "hidden",
@@ -280,7 +280,7 @@ export function Phone({
                   alt=""
                   width={34}
                   height={34}
-                  quality={90}
+                  unoptimized
                   className="size-[34px] rounded-[11px] object-cover transition duration-200 group-hover/app:-translate-y-0.5"
                 />
                 <span className="max-w-10 truncate text-[5.5px] text-white/85">
@@ -298,7 +298,7 @@ export function Phone({
                       alt="Duck Routine 앱 아이콘"
                       width={36}
                       height={36}
-                      quality={100}
+                      unoptimized
                       className="size-9 shrink-0 rounded-[10px] object-cover shadow-[0_5px_14px_rgba(0,0,0,.28)]"
                     />
                     <div className="min-w-0 flex-1">
@@ -342,7 +342,17 @@ export function Phone({
                     ].map(({ name, icon: TechIcon, color }) => (
                       <div key={name} className="flex h-6 min-w-0 items-center justify-center gap-1 rounded-full border border-white/[.08] px-1 text-white/58">
                         <TechIcon size={8} className={color} aria-hidden="true" />
-                        <span className="whitespace-nowrap text-[4.75px]">{name}</span>
+                        <span className="whitespace-nowrap text-center text-[4.75px] leading-[1.05]">
+                          {name === "React Native" ? (
+                            <>
+                              React
+                              <br />
+                              Native
+                            </>
+                          ) : (
+                            name
+                          )}
+                        </span>
                       </div>
                     ))}
                   </div>

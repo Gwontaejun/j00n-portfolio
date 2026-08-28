@@ -1,5 +1,22 @@
 import type { Metadata } from "next";
+import localFont from "next/font/local";
 import "./globals.css";
+
+const a2z = localFont({
+  src: [
+    { path: "../src/assets/fonts/에이투지체-1Thin.woff2", weight: "100" },
+    { path: "../src/assets/fonts/에이투지체-2ExtraLight.woff2", weight: "200" },
+    { path: "../src/assets/fonts/에이투지체-3Light.woff2", weight: "300" },
+    { path: "../src/assets/fonts/에이투지체-4Regular.woff2", weight: "400" },
+    { path: "../src/assets/fonts/에이투지체-5Medium.woff2", weight: "500" },
+    { path: "../src/assets/fonts/에이투지체-6SemiBold.woff2", weight: "600" },
+    { path: "../src/assets/fonts/에이투지체-7Bold.woff2", weight: "700" },
+    { path: "../src/assets/fonts/에이투지체-8ExtraBold.woff2", weight: "800" },
+    { path: "../src/assets/fonts/에이투지체-9Black.woff2", weight: "900" },
+  ],
+  display: "swap",
+  fallback: ["Arial", "sans-serif"],
+});
 
 export const metadata: Metadata = {
   title: "j00n — Desk Portfolio",
@@ -22,7 +39,7 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="ko">
-      <body>{children}</body>
+      <body className={a2z.className}>{children}</body>
     </html>
   );
 }

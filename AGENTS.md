@@ -14,12 +14,12 @@
 ## 기술 및 구조
 
 - Next.js App Router, TypeScript strict mode, Tailwind CSS, React Three Fiber, drei, Framer Motion을 사용한다.
-- 실행과 빌드는 `vinext` npm 스크립트를 사용한다.
+- 개발과 빌드는 공식 Next.js CLI인 `next dev`, `next build`, `next start` npm 스크립트를 사용한다.
 - 경로 별칭 `@/*`는 `src/*`를 가리킨다.
 - 프로젝트 데이터는 `src/data/projects.ts`, 타입은 `src/types/project.ts`에서 관리한다.
 - 기능별 코드는 `src/features`, 여러 기능이 공유하는 코드는 `src/shared`에 둔다.
 - GLB 모델은 `public/3d-models`의 기존 파일을 우선 사용한다. 승인 없이 조잡한 기본 도형으로 대체하지 않는다.
-- 생성 파일인 `*.tsbuildinfo`, `.next`, `.vinext`, `dist`는 커밋하지 않는다.
+- 생성 파일인 `*.tsbuildinfo`, `.next`, 이전 런타임 잔여물인 `.vinext`, `out`은 커밋하지 않는다.
 
 ## 핵심 UX 규칙
 

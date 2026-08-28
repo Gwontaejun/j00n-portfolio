@@ -1,9 +1,16 @@
-'use client';
+"use client";
 
-import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
-import { useEffect, useRef } from 'react';
-import { LuArrowLeft, LuArrowRight, LuFileText, LuMonitor, LuSmartphone, LuStickyNote } from 'react-icons/lu';
-import type { SceneGuideTarget } from '@/types/scene-guide';
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { useEffect, useRef } from "react";
+import {
+  LuArrowLeft,
+  LuArrowRight,
+  LuFileText,
+  LuMonitor,
+  LuSmartphone,
+  LuStickyNote,
+} from "react-icons/lu";
+import type { SceneGuideTarget } from "@/types/scene-guide";
 
 type SceneGuideProps = {
   open: boolean;
@@ -14,56 +21,64 @@ type SceneGuideProps = {
 
 const guideSteps = [
   {
-    eyebrow: 'WEB PROJECT',
-    title: '모니터',
-    description: '모니터를 선택하면 웹 프로젝트와 사용한 기술을 확인할 수 있어요.',
+    eyebrow: "WEB PROJECT",
+    title: "모니터",
+    description: "모니터를 클릭하면 제가 만든\n웹 프로젝트를 둘러볼 수 있어요.",
     icon: LuMonitor,
-    target: 'monitor' as SceneGuideTarget,
-    labelClassName: 'left-[25%] top-[17%]',
-    dotClassName: 'left-[58.2%] top-[39.1%]',
-    linePath: 'M 37 27 L 48 27 L 58.2 39.1',
+    target: "monitor" as SceneGuideTarget,
+    labelClassName: "left-[25%] top-[17%]",
+    dotClassName: "left-[58.2%] top-[39.1%]",
+    linePath: "M 37 27 L 48 27 L 58.2 39.1",
   },
   {
-    eyebrow: 'APP PROJECT',
-    title: '휴대폰',
-    description: '휴대폰을 선택하면 직접 만든 모바일 앱을 둘러볼 수 있어요.',
+    eyebrow: "APP PROJECT",
+    title: "휴대폰",
+    description: `휴대폰을 클릭하면 제가 만든\n모바일 앱을 둘러볼 수 있어요.`,
     icon: LuSmartphone,
-    target: 'phone' as SceneGuideTarget,
-    labelClassName: 'right-[5%] top-[31%] text-right',
-    dotClassName: 'left-[84.6%] top-[56%]',
-    linePath: 'M 91 42 L 89 47 L 84.6 56',
+    target: "phone" as SceneGuideTarget,
+    labelClassName: "right-[5%] top-[31%] text-right",
+    dotClassName: "left-[84.6%] top-[56%]",
+    linePath: "M 91 42 L 89 47 L 84.6 56",
   },
   {
-    eyebrow: 'PROFILE',
-    title: '프로필',
-    description: '왼쪽 문서를 선택하면 이력서와 경력 정보를 확인할 수 있어요.',
+    eyebrow: "PROFILE",
+    title: "프로필",
+    description: "문서를 클릭하면 제 이력과 경력 정보를\n확인할 수 있어요.",
     icon: LuFileText,
-    target: 'profile' as SceneGuideTarget,
-    labelClassName: 'left-[29%] top-[17%]',
-    dotClassName: 'left-[22.7%] top-[36.7%]',
-    linePath: 'M 29 27 L 26 27 L 22.7 36.7',
+    target: "profile" as SceneGuideTarget,
+    labelClassName: "left-[29%] top-[17%]",
+    dotClassName: "left-[22.7%] top-[36.7%]",
+    linePath: "M 29 27 L 26 27 L 22.7 36.7",
   },
   {
-    eyebrow: 'GUESTBOOK',
-    title: '방명록',
-    description: '포스트잇을 선택해 방문 기록을 남기고 다른 사람의 메시지도 확인해보세요.',
+    eyebrow: "GUESTBOOK",
+    title: "방명록",
+    description:
+      "포스트잇을 클릭해 방문 기록을 남기고\n다른 사람의 메시지도 확인해보세요.",
     icon: LuStickyNote,
-    target: 'guestbook' as SceneGuideTarget,
-    labelClassName: 'left-[30%] top-[57%]',
-    dotClassName: 'left-[11.9%] top-[45.4%]',
-    linePath: 'M 30 65 L 21 60 L 11.9 45.4',
+    target: "guestbook" as SceneGuideTarget,
+    labelClassName: "left-[30%] top-[57%]",
+    dotClassName: "left-[11.9%] top-[45.4%]",
+    linePath: "M 30 65 L 21 60 L 11.9 45.4",
   },
 ] as const;
 
 function GuideDot({ className }: { className: string }) {
   return (
-    <div className={`pointer-events-none absolute -translate-x-1/2 -translate-y-1/2 ${className}`}>
+    <div
+      className={`pointer-events-none absolute -translate-x-1/2 -translate-y-1/2 ${className}`}
+    >
       <span className="block size-2 rounded-full border border-white/90 bg-sky-300" />
     </div>
   );
 }
 
-export function SceneGuide({ open, stepIndex, onStepChange, onClose }: SceneGuideProps) {
+export function SceneGuide({
+  open,
+  stepIndex,
+  onStepChange,
+  onClose,
+}: SceneGuideProps) {
   const reduceMotion = useReducedMotion();
   const nextButtonRef = useRef<HTMLButtonElement>(null);
   const step = guideSteps[stepIndex];
@@ -75,11 +90,11 @@ export function SceneGuide({ open, stepIndex, onStepChange, onClose }: SceneGuid
     nextButtonRef.current?.focus();
 
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') onClose();
+      if (event.key === "Escape") onClose();
     };
 
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
   }, [open, onClose]);
 
   const handleNext = () => {
@@ -103,7 +118,12 @@ export function SceneGuide({ open, stepIndex, onStepChange, onClose }: SceneGuid
           exit={{ opacity: 0 }}
           transition={{ duration: reduceMotion ? 0.01 : 0.35 }}
         >
-          <svg className="absolute inset-0 size-full" aria-hidden="true" viewBox="0 0 100 100" preserveAspectRatio="none">
+          <svg
+            className="absolute inset-0 size-full"
+            aria-hidden="true"
+            viewBox="0 0 100 100"
+            preserveAspectRatio="none"
+          >
             <motion.path
               key={step.linePath}
               d={step.linePath}
@@ -114,7 +134,10 @@ export function SceneGuide({ open, stepIndex, onStepChange, onClose }: SceneGuid
               strokeLinejoin="round"
               initial={reduceMotion ? false : { pathLength: 0, opacity: 0 }}
               animate={{ pathLength: 1, opacity: 1 }}
-              transition={{ duration: reduceMotion ? 0.01 : 0.45, ease: 'easeOut' }}
+              transition={{
+                duration: reduceMotion ? 0.01 : 0.45,
+                ease: "easeOut",
+              }}
             />
           </svg>
 
@@ -128,12 +151,20 @@ export function SceneGuide({ open, stepIndex, onStepChange, onClose }: SceneGuid
               transition={{ duration: reduceMotion ? 0.01 : 0.2 }}
             >
               <div className={`absolute ${step.labelClassName}`}>
-                <div className={`mb-2 flex items-center gap-2 ${step.labelClassName.includes('text-right') ? 'justify-end' : ''}`}>
+                <div
+                  className={`mb-2 flex items-center gap-2 ${step.labelClassName.includes("text-right") ? "justify-end" : ""}`}
+                >
                   <Icon size={15} className="text-sky-200" aria-hidden="true" />
-                  <span className="text-[10px] font-semibold tracking-[0.18em] text-sky-200/75">{step.eyebrow}</span>
+                  <span className="text-[10px] font-semibold tracking-[0.18em] text-sky-200/75">
+                    {step.eyebrow}
+                  </span>
                 </div>
-                <p className="text-lg font-semibold tracking-[-0.02em]">{step.title}</p>
-                <p className="mt-1 max-w-[230px] text-[13px] leading-5 text-white/60">{step.description}</p>
+                <p className="text-lg font-semibold tracking-[-0.02em]">
+                  {step.title}
+                </p>
+                <p className="mt-1 max-w-[230px] whitespace-pre-line text-[13px] leading-5 text-white/60">
+                  {step.description}
+                </p>
               </div>
               <GuideDot className={step.dotClassName} />
             </motion.div>
@@ -148,19 +179,26 @@ export function SceneGuide({ open, stepIndex, onStepChange, onClose }: SceneGuid
             >
               <div className="flex items-center gap-2 text-sky-200">
                 <Icon size={15} aria-hidden="true" />
-                <span className="text-[10px] font-semibold tracking-[0.16em]">{step.eyebrow}</span>
+                <span className="text-[10px] font-semibold tracking-[0.16em]">
+                  {step.eyebrow}
+                </span>
               </div>
               <p className="mt-2 text-base font-semibold">{step.title}</p>
-              <p className="mt-1 text-xs leading-5 text-white/58">{step.description}</p>
+              <p className="mt-1 whitespace-pre-line text-xs leading-5 text-white/58">
+                {step.description}
+              </p>
             </motion.div>
           </div>
 
           <div className="absolute inset-x-0 bottom-5 flex flex-col items-center gap-3 px-4 sm:bottom-8">
-            <div className="flex items-center gap-1.5" aria-label={`${guideSteps.length}단계 중 ${stepIndex + 1}단계`}>
+            <div
+              className="flex items-center gap-1.5"
+              aria-label={`${guideSteps.length}단계 중 ${stepIndex + 1}단계`}
+            >
               {guideSteps.map((guideStep, index) => (
                 <span
                   key={guideStep.title}
-                  className={`h-1 rounded-full transition-all ${index === stepIndex ? 'w-6 bg-white' : 'w-1.5 bg-white/30'}`}
+                  className={`h-1 rounded-full transition-all ${index === stepIndex ? "w-6 bg-white" : "w-1.5 bg-white/30"}`}
                 />
               ))}
             </div>
@@ -181,9 +219,13 @@ export function SceneGuide({ open, stepIndex, onStepChange, onClose }: SceneGuid
                 onClick={handleNext}
                 className="group flex items-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-[#11151b] shadow-[0_10px_30px_rgba(0,0,0,0.32)] transition hover:bg-sky-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300 focus-visible:ring-offset-2 focus-visible:ring-offset-[#080b10]"
               >
-                {isLastStep ? '확인' : '다음'}
+                {isLastStep ? "확인" : "다음"}
                 {!isLastStep && (
-                  <LuArrowRight size={16} className="transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
+                  <LuArrowRight
+                    size={16}
+                    className="transition-transform group-hover:translate-x-0.5"
+                    aria-hidden="true"
+                  />
                 )}
               </button>
             </div>

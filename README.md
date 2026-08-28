@@ -24,7 +24,7 @@ npm run lint
 npm run build
 ```
 
-이 프로젝트는 Next.js App Router API를 사용하지만, 개발 및 빌드 런타임은 `vinext`와 Vite 기반입니다. 일반적인 `next dev`가 아니라 위 npm 스크립트를 사용해야 합니다.
+이 프로젝트는 공식 Next.js App Router와 Next.js CLI를 사용합니다. 개발·빌드·실행은 위 npm 스크립트를 사용합니다.
 
 ## 주요 구조
 

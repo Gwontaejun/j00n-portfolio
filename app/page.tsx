@@ -21,7 +21,6 @@ const DeskScene = dynamic(
 export default function Home() {
   const [activeCategory, setActiveCategory] = useState<ProjectCategory | null>(null);
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
-  const [cameraControlsEnabled, setCameraControlsEnabled] = useState(false);
   const [isMonitorFocused, setIsMonitorFocused] = useState(false);
   const [isSceneReady, setIsSceneReady] = useState(false);
   const [isGuideOpen, setIsGuideOpen] = useState(false);
@@ -65,13 +64,12 @@ export default function Home() {
       <section aria-label="3D 작업 책상" className="absolute inset-0">
         <DeskScene
           onSelect={openProjects}
-          cameraControlsEnabled={cameraControlsEnabled}
           onMonitorFocusChange={setIsMonitorFocused}
           onSceneReady={handleSceneReady}
           guideTarget={isGuideOpen ? GUIDE_TARGETS[guideStepIndex] : null}
         />
       </section>
-      <IntroOverlay cameraControlsEnabled={cameraControlsEnabled} hidden={!isSceneReady || isMonitorFocused} onToggleCamera={() => setCameraControlsEnabled((enabled) => !enabled)} onOpenGuide={openGuide} />
+      <IntroOverlay hidden={!isSceneReady || isMonitorFocused} onOpenGuide={openGuide} />
       <ProjectPanel category={activeCategory} selectedProjectId={selectedProjectId} onClose={closePanel} />
       <SceneGuide open={isGuideOpen} stepIndex={guideStepIndex} onStepChange={setGuideStepIndex} onClose={closeGuide} />
     </main>

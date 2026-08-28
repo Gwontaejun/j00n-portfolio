@@ -31,7 +31,6 @@ import {
 
 function Workspace({
   onSelect,
-  cameraControlsEnabled,
   monitorFocused,
   phoneFocused,
   guestbookFocused,
@@ -45,7 +44,6 @@ function Workspace({
   guideTarget,
 }: {
   onSelect: (category: ProjectCategory, projectId?: string) => void;
-  cameraControlsEnabled: boolean;
   monitorFocused: boolean;
   phoneFocused: boolean;
   guestbookFocused: boolean;
@@ -90,14 +88,9 @@ function Workspace({
       monitorFocused ||
       guestbookFocused ||
       cameraTransitioning.current ||
-      (!cameraControlsEnabled && !phoneFocused);
+      !phoneFocused;
     if (controls) {
-      controls.enabled =
-        !phoneFocused &&
-        !monitorFocused &&
-        !guestbookFocused &&
-        !shouldAnimate &&
-        cameraControlsEnabled;
+      controls.enabled = false;
     }
     if (!shouldAnimate) return;
 
@@ -126,7 +119,7 @@ function Workspace({
       if (!monitorFocused && !phoneFocused && !guestbookFocused) {
         cameraTransitioning.current = false;
         if (controls) {
-          controls.enabled = cameraControlsEnabled;
+          controls.enabled = false;
           controls.update();
         }
       }
@@ -206,24 +199,9 @@ function Workspace({
       <OrbitControls
         ref={controlsRef}
         enabled={false}
-        enableRotate={
-          cameraControlsEnabled &&
-          !monitorFocused &&
-          !phoneFocused &&
-          !guestbookFocused
-        }
-        enablePan={
-          cameraControlsEnabled &&
-          !monitorFocused &&
-          !phoneFocused &&
-          !guestbookFocused
-        }
-        enableZoom={
-          cameraControlsEnabled &&
-          !monitorFocused &&
-          !phoneFocused &&
-          !guestbookFocused
-        }
+        enableRotate={false}
+        enablePan={false}
+        enableZoom={false}
         panSpeed={0.75}
         screenSpacePanning
         enableDamping
@@ -370,13 +348,11 @@ function SceneBranding({
 
 export function DeskScene({
   onSelect,
-  cameraControlsEnabled,
   onMonitorFocusChange,
   onSceneReady,
   guideTarget,
 }: {
   onSelect: (category: ProjectCategory, projectId?: string) => void;
-  cameraControlsEnabled: boolean;
   onMonitorFocusChange: (focused: boolean) => void;
   onSceneReady: () => void;
   guideTarget: SceneGuideTarget | null;
@@ -437,7 +413,6 @@ export function DeskScene({
         <Suspense fallback={null}>
           <Workspace
             onSelect={handleSelect}
-            cameraControlsEnabled={cameraControlsEnabled}
             monitorFocused={monitorFocused}
             phoneFocused={phoneFocused}
             guestbookFocused={guestbookFocused}

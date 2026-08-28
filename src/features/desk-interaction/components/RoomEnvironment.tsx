@@ -40,15 +40,21 @@ const rainFragmentShader = /* glsl */ `
 
     float column = floor(p.x);
     float columnRandom = hash21(vec2(column, seed));
-    float fallSpeed = speed * mix(0.48, 1.55, columnRandom);
-    p.y += uTime * fallSpeed + columnRandom * 9.7;
-    p.x += sin(uTime * 0.1 + columnRandom * 12.0) * 0.008;
+    float phase = columnRandom * 11.7;
+    float cycle = floor((uTime * speed + phase) * 0.42);
+    float cycleRandom = hash21(vec2(column + cycle * 19.17, seed + cycle * 0.73));
+    float cycleRandom2 = hash21(vec2(column - cycle * 7.31, seed + cycle * 3.19));
+    float fallSpeed = speed * mix(0.52, 1.48, cycleRandom);
+
+    p.y += uTime * fallSpeed + phase + cycleRandom2 * 3.4;
+    p.x += (cycleRandom - 0.5) * 0.86;
+    p.x += sin(uTime * mix(0.08, 0.2, cycleRandom2) + columnRandom * 12.0) * 0.015;
 
     vec2 cell = floor(p);
     vec2 local = fract(p) - 0.5;
-    float random = hash21(cell + seed);
-    float random2 = hash21(cell + seed + 17.4);
-    float timeOffset = hash21(cell + seed + 31.8);
+    float random = hash21(cell + vec2(seed + cycle * 2.17, cycleRandom * 13.1));
+    float random2 = hash21(cell + vec2(seed + 17.4, cycle * 5.73));
+    float timeOffset = hash21(cell + vec2(seed + 31.8, cycle * 1.91));
     local.y += (timeOffset - 0.5) * 0.34;
     local.x += (random - 0.5) * 0.9;
     local.x += sin(local.y * 8.0 + random * 6.283) * 0.003;
@@ -56,7 +62,7 @@ const rainFragmentShader = /* glsl */ `
     float width = mix(0.003, 0.009, random);
     float line = 1.0 - smoothstep(width, width + 0.009, abs(local.x));
     float head = mix(0.02, 0.42, random2);
-    float dropLength = mix(0.1, 0.5, random);
+    float dropLength = mix(0.08, 0.52, hash21(vec2(random * 21.3, cycleRandom2 * 17.8)));
     float tail = head - dropLength;
     float segment = smoothstep(tail - 0.05, tail + 0.035, local.y)
       * (1.0 - smoothstep(head, head + 0.07, local.y));
