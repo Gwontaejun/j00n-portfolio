@@ -276,13 +276,13 @@ function SceneBranding({
               duration: reduceMotion ? 0.1 : 0.7,
               ease: "easeInOut",
             }}
-            className="pointer-events-none absolute inset-0 z-[20000000] grid place-items-center bg-[radial-gradient(circle_at_50%_42%,#18202a_0%,#0b0e13_48%,#06080b_100%)] text-white"
+            className="pointer-events-auto absolute inset-0 z-[20000000] grid place-items-center bg-[radial-gradient(circle_at_50%_42%,#18202a_0%,#0b0e13_48%,#06080b_100%)] text-white"
           >
             <motion.div
               initial={reduceMotion ? false : { opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
-              className="text-center"
+              className="flex w-max flex-col items-center text-center"
             >
               <p
                 aria-label="J00N"
@@ -315,9 +315,9 @@ function SceneBranding({
                   duration: reduceMotion ? 0 : 0.45,
                   delay: !reduceMotion && typedCharacterCount === 4 ? 0.3 : 0,
                 }}
-                className="mt-2 text-[10px] tracking-[0.52em] text-white/45 sm:text-[11px]"
+                className="mt-2 text-center text-[12px] font-medium tracking-[0.18em] text-white/55 [text-indent:0.18em] sm:text-[13px]"
               >
-                PORTFOLIO
+                Frontend Developer
               </motion.p>
             </motion.div>
           </motion.div>
@@ -331,13 +331,13 @@ function SceneBranding({
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -6 }}
             transition={{ duration: reduceMotion ? 0.1 : 0.4 }}
-            className="pointer-events-none absolute left-5 top-5 z-[20000000] text-center text-white sm:left-8 sm:top-8"
+            className="pointer-events-none absolute left-5 top-5 z-[20000000] flex w-max flex-col items-center text-center text-white sm:left-8 sm:top-8"
           >
             <p className="text-[38px] font-semibold leading-none tracking-[-0.06em]">
               J00N
             </p>
-            <p className="mt-[5px] text-[7px] tracking-[0.52em] text-white/42">
-              PORTFOLIO
+            <p className="mt-1.5 whitespace-nowrap text-center text-[9px] font-medium tracking-[0.16em] text-white/52 [text-indent:0.16em]">
+              Frontend Developer
             </p>
           </motion.div>
         )}

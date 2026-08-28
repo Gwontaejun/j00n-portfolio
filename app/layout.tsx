@@ -19,17 +19,17 @@ const a2z = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "j00n — Desk Portfolio",
+  title: "J00N | Frontend Developer",
   description:
-    "웹과 모바일 앱을 만드는 개발자 j00n의 인터랙티브 작업 책상 포트폴리오",
+    "웹과 모바일 앱을 만드는 개발자 J00N의 인터랙티브 작업 책상 포트폴리오",
   openGraph: {
-    title: "j00n — Desk Portfolio",
+    title: "J00N | Frontend Developer",
     description: "모니터와 휴대폰을 눌러 프로젝트를 살펴보세요.",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "j00n — Desk Portfolio",
+    title: "J00N | Frontend Developer",
     description: "인터랙티브 작업 책상 포트폴리오",
   },
 };
