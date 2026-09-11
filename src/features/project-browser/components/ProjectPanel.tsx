@@ -37,7 +37,9 @@ export function ProjectPanel({ category, selectedProjectId, onClose }: ProjectPa
                     <div><h3 className="font-semibold">{project.title}</h3><p className="mt-1 text-sm leading-5 text-white/60">{project.description}</p></div>
                   </div>
                   <div className="flex flex-wrap gap-1.5">{project.technologies.map((tech) => <span key={tech} className="rounded-full bg-white/8 px-2.5 py-1 text-xs text-white/65">{tech}</span>)}</div>
-                  <a href={project.href} target="_blank" rel="noreferrer" className="mt-4 inline-flex rounded-xl bg-white px-3 py-2 text-sm font-medium text-[#171b24] transition hover:bg-orange-100">{category === 'web' ? '웹사이트 보기 ↗' : '플레이스토어 보기 ↗'}</a>
+                  {project.href && (
+                    <a href={project.href} target="_blank" rel="noreferrer" className="mt-4 inline-flex rounded-xl bg-white px-3 py-2 text-sm font-medium text-[#171b24] transition hover:bg-orange-100">{category === 'web' ? '웹사이트 보기 ↗' : '플레이스토어 보기 ↗'}</a>
+                  )}
                 </article>
               );
             })}

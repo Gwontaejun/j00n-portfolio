@@ -5,13 +5,15 @@ export type PortfolioProject = {
   title: string;
   subtitle?: string;
   projectType?: string;
+  organization?: string;
+  period?: string;
   description: string;
   technologies: string[];
   features?: Array<{
     title: string;
     description: string;
   }>;
-  href: string;
+  href?: string;
   repositoryHref?: string;
   image: string;
   accent: string;

@@ -66,14 +66,14 @@ function Workspace({
   const monitorPosition = useRef(
     new Vector3(
       WORKSPACE_OFFSET[0] + DESKTOP_ITEMS_OFFSET_X,
-      2.08,
-      WORKSPACE_OFFSET[2] + 1.2,
+      2.228,
+      WORKSPACE_OFFSET[2] + 1.39,
     ),
   );
   const monitorTarget = useRef(
     new Vector3(
       WORKSPACE_OFFSET[0] + DESKTOP_ITEMS_OFFSET_X,
-      2.1,
+      2.25,
       WORKSPACE_OFFSET[2] - 0.5,
     ),
   );
