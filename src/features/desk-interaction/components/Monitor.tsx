@@ -265,6 +265,7 @@ export function Monitor({
         center
         transform
         occlude={false}
+        zIndexRange={[10, 0]}
         position={[MONITOR_SCREEN_X, MONITOR_SCREEN_Y, 0.104]}
         distanceFactor={0.495}
         style={{

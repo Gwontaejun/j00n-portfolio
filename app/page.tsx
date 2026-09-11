@@ -1,17 +1,25 @@
-'use client';
+"use client";
 
-import dynamic from 'next/dynamic';
-import { useCallback, useEffect, useState } from 'react';
-import { IntroOverlay } from '@/features/project-browser/components/IntroOverlay';
-import { ProjectPanel } from '@/features/project-browser/components/ProjectPanel';
-import { SceneGuide } from '@/features/project-browser/components/SceneGuide';
-import type { ProjectCategory } from '@/types/project';
-import type { SceneGuideTarget } from '@/types/scene-guide';
+import dynamic from "next/dynamic";
+import { useCallback, useEffect, useState } from "react";
+import { IntroOverlay } from "@/features/project-browser/components/IntroOverlay";
+import { ProjectPanel } from "@/features/project-browser/components/ProjectPanel";
+import { SceneGuide } from "@/features/project-browser/components/SceneGuide";
+import type { ProjectCategory } from "@/types/project";
+import type { SceneGuideTarget } from "@/types/scene-guide";
 
-const GUIDE_TARGETS: SceneGuideTarget[] = ['monitor', 'phone', 'profile', 'guestbook'];
+const GUIDE_TARGETS: SceneGuideTarget[] = [
+  "monitor",
+  "phone",
+  "profile",
+  "guestbook",
+];
 
 const DeskScene = dynamic(
-  () => import('@/features/desk-interaction/components/DeskScene').then((module) => module.DeskScene),
+  () =>
+    import("@/features/desk-interaction/components/DeskScene").then(
+      (module) => module.DeskScene,
+    ),
   {
     ssr: false,
     loading: () => <div className="h-full bg-[#080a0e]" />,
@@ -19,17 +27,24 @@ const DeskScene = dynamic(
 );
 
 export default function Home() {
-  const [activeCategory, setActiveCategory] = useState<ProjectCategory | null>(null);
-  const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
+  const [activeCategory, setActiveCategory] = useState<ProjectCategory | null>(
+    null,
+  );
+  const [selectedProjectId, setSelectedProjectId] = useState<string | null>(
+    null,
+  );
   const [isMonitorFocused, setIsMonitorFocused] = useState(false);
   const [isSceneReady, setIsSceneReady] = useState(false);
   const [isGuideOpen, setIsGuideOpen] = useState(false);
   const [guideStepIndex, setGuideStepIndex] = useState(0);
 
-  const openProjects = useCallback((category: ProjectCategory, projectId?: string) => {
-    setSelectedProjectId(projectId ?? null);
-    setActiveCategory(category);
-  }, []);
+  const openProjects = useCallback(
+    (category: ProjectCategory, projectId?: string) => {
+      setSelectedProjectId(projectId ?? null);
+      setActiveCategory(category);
+    },
+    [],
+  );
 
   const closePanel = useCallback(() => {
     setActiveCategory(null);
@@ -38,10 +53,10 @@ export default function Home() {
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') closePanel();
+      if (event.key === "Escape") closePanel();
     };
-    window.addEventListener('keydown', onKeyDown);
-    return () => window.removeEventListener('keydown', onKeyDown);
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
   }, [closePanel]);
 
   const closeGuide = useCallback(() => {
@@ -69,9 +84,16 @@ export default function Home() {
           guideTarget={isGuideOpen ? GUIDE_TARGETS[guideStepIndex] : null}
         />
       </section>
-      <IntroOverlay hidden={!isSceneReady || isMonitorFocused} onOpenGuide={openGuide} />
-      <ProjectPanel category={activeCategory} selectedProjectId={selectedProjectId} onClose={closePanel} />
-      <SceneGuide open={isGuideOpen} stepIndex={guideStepIndex} onStepChange={setGuideStepIndex} onClose={closeGuide} />
+      <IntroOverlay
+        hidden={!isSceneReady || isMonitorFocused}
+        onOpenGuide={openGuide}
+      />
+      <SceneGuide
+        open={isGuideOpen}
+        stepIndex={guideStepIndex}
+        onStepChange={setGuideStepIndex}
+        onClose={closeGuide}
+      />
     </main>
   );
 }

@@ -33,6 +33,15 @@ type PhoneProps = {
   guideDimmed?: boolean;
   onFocus: () => void;
   onSelect: (projectId?: string) => void;
+  foregroundTransformRef?: {
+    current: PhoneForegroundTransform;
+  };
+};
+
+export type PhoneForegroundTransform = {
+  position: Vector3;
+  quaternion: Quaternion;
+  scale: Vector3;
 };
 
 const DUCK_FEATURE_ICONS = [LuListChecks, LuTimer, LuCalendarDays, LuChartBar];
@@ -50,6 +59,7 @@ export function Phone({
   guideDimmed = false,
   onFocus,
   onSelect,
+  foregroundTransformRef,
 }: PhoneProps) {
   const [hovered, setHovered] = useState(false);
   const [activeScreen, setActiveScreen] = useState<"home" | "duck-routine">("home");
@@ -70,6 +80,7 @@ export function Phone({
   const rootWorldQuaternion = useRef(new Quaternion());
   const phoneWorldPosition = useRef(new Vector3());
   const phoneWorldQuaternion = useRef(new Quaternion());
+  const phoneWorldScale = useRef(new Vector3(1, 1, 1));
   const phoneScreenNormal = useRef(new Vector3());
   const phoneCameraDirection = useRef(new Vector3());
   const [frontFacing, setFrontFacing] = useState(true);
@@ -136,6 +147,12 @@ export function Phone({
 
     phone.getWorldPosition(phoneWorldPosition.current);
     phone.getWorldQuaternion(phoneWorldQuaternion.current);
+    phone.getWorldScale(phoneWorldScale.current);
+    if (foregroundTransformRef) {
+      foregroundTransformRef.current.position.copy(phoneWorldPosition.current);
+      foregroundTransformRef.current.quaternion.copy(phoneWorldQuaternion.current);
+      foregroundTransformRef.current.scale.copy(phoneWorldScale.current);
+    }
     phoneScreenNormal.current
       .set(0, 1, 0)
       .applyQuaternion(phoneWorldQuaternion.current);
@@ -197,6 +214,7 @@ export function Phone({
         <Html
           center
           transform
+          zIndexRange={focused ? [1000, 1000] : [20, 0]}
           position={[0, 0.034, 0.004]}
           rotation={[-Math.PI / 2, 0, 0]}
           distanceFactor={0.247}
@@ -249,7 +267,7 @@ export function Phone({
               backfaceVisibility: "hidden",
               WebkitBackfaceVisibility: "hidden",
             }}
-            className={`relative flex h-[384px] w-[176px] flex-col overflow-hidden rounded-[10px] border border-white/[.07] bg-[#111318] px-3 pb-2 pt-2 text-white outline-none ${focused ? "cursor-default" : "cursor-pointer"}`}
+            className={`relative flex h-[386px] w-[178px] flex-col overflow-hidden rounded-[8px] border border-white/[.07] bg-[#111318] px-3 pb-2 pt-2 text-white outline-none ${focused ? "cursor-default" : "cursor-pointer"}`}
           >
             <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
               <span className="absolute -right-10 top-7 h-36 w-28 rotate-[28deg] rounded-[45%] bg-[#ff8a3d]/10 blur-md" />

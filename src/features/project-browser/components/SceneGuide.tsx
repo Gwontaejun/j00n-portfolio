@@ -23,10 +23,11 @@ const guideSteps = [
   {
     eyebrow: "WEB PROJECT",
     title: "모니터",
-    description: "모니터를 클릭하면 제가 만든\n웹 프로젝트를 둘러볼 수 있어요.",
+    description:
+      "모니터를 클릭하면 실무·사이드 프로젝트와\n프로필 정보를 확인할 수 있어요.",
     icon: LuMonitor,
     target: "monitor" as SceneGuideTarget,
-    labelClassName: "left-[25%] top-[17%]",
+    labelClassName: "left-[24%] top-[20%]",
     dotClassName: "left-[58.2%] top-[39.1%]",
     linePath: "M 37 27 L 48 27 L 58.2 39.1",
   },
@@ -43,10 +44,11 @@ const guideSteps = [
   {
     eyebrow: "PROFILE",
     title: "프로필",
-    description: "문서를 클릭하면 제 이력과 경력 정보를\n확인할 수 있어요.",
+    description:
+      "문서를 클릭하면 제 이력과 경력 정보를\n자세하게 확인할 수 있어요.",
     icon: LuFileText,
     target: "profile" as SceneGuideTarget,
-    labelClassName: "left-[29%] top-[17%]",
+    labelClassName: "left-[30%] top-[22%]",
     dotClassName: "left-[22.7%] top-[36.7%]",
     linePath: "M 29 27 L 26 27 L 22.7 36.7",
   },
@@ -57,7 +59,7 @@ const guideSteps = [
       "포스트잇을 클릭해 방문 기록을 남기고\n다른 사람의 메시지도 확인해보세요.",
     icon: LuStickyNote,
     target: "guestbook" as SceneGuideTarget,
-    labelClassName: "left-[30%] top-[57%]",
+    labelClassName: "left-[31%] top-[59%]",
     dotClassName: "left-[11.9%] top-[45.4%]",
     linePath: "M 30 65 L 21 60 L 11.9 45.4",
   },
@@ -162,7 +164,7 @@ export function SceneGuide({
                 <p className="text-lg font-semibold tracking-[-0.02em]">
                   {step.title}
                 </p>
-                <p className="mt-1 max-w-[230px] whitespace-pre-line text-[13px] leading-5 text-white/60">
+                <p className="mt-1 max-w-[240px] whitespace-pre-line text-[13px] leading-5 text-white/60">
                   {step.description}
                 </p>
               </div>

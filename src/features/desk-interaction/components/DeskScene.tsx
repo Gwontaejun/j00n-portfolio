@@ -1,5 +1,7 @@
 "use client";
 
+/* eslint-disable react-hooks/immutability -- React Three Fiber updates cameras and Object3D refs imperatively per frame. */
+
 import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import {
@@ -8,13 +10,13 @@ import {
   useGLTF,
   useProgress,
 } from "@react-three/drei";
-import { MathUtils, MOUSE, Vector3 } from "three";
+import { Group, MathUtils, MOUSE, PerspectiveCamera, Quaternion, Vector3 } from "three";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 import { ModelAsset } from "./ModelAsset";
 import { DeskAccessories, DeskMoodLamp } from "./DeskAccessories";
 import { Monitor } from "./Monitor";
-import { Phone } from "./Phone";
+import { Phone, type PhoneForegroundTransform } from "./Phone";
 import { RoomEnvironment } from "./RoomEnvironment";
 import { ProfileBoard } from "./ProfileBoard";
 import { ResumeViewer } from "./ResumeViewer";
@@ -29,6 +31,62 @@ import {
   WORKSPACE_OFFSET,
 } from "../model/scene";
 
+type CameraSnapshot = {
+  position: Vector3;
+  quaternion: Quaternion;
+  fov: number;
+  near: number;
+  far: number;
+};
+
+function CameraSnapshotRecorder({ snapshot }: { snapshot: { current: CameraSnapshot } }) {
+  const camera = useThree((state) => state.camera as PerspectiveCamera);
+
+  useFrame(() => {
+    snapshot.current.position.copy(camera.position);
+    snapshot.current.quaternion.copy(camera.quaternion);
+    snapshot.current.fov = camera.fov;
+    snapshot.current.near = camera.near;
+    snapshot.current.far = camera.far;
+  }, -2);
+
+  return null;
+}
+
+function ForegroundPhone({
+  cameraSnapshot,
+  transform,
+}: {
+  cameraSnapshot: { current: CameraSnapshot };
+  transform: { current: PhoneForegroundTransform };
+}) {
+  const camera = useThree((state) => state.camera as PerspectiveCamera);
+  const modelRef = useRef<Group>(null);
+
+  useFrame(() => {
+    const snapshot = cameraSnapshot.current;
+    camera.position.copy(snapshot.position);
+    camera.quaternion.copy(snapshot.quaternion);
+    camera.fov = snapshot.fov;
+    camera.near = snapshot.near;
+    camera.far = snapshot.far;
+    camera.updateProjectionMatrix();
+
+    const model = modelRef.current;
+    if (!model) return;
+    model.position.copy(transform.current.position);
+    model.quaternion.copy(transform.current.quaternion);
+    model.scale.copy(transform.current.scale);
+    model.visible = true;
+  }, -1);
+
+  return (
+    <group ref={modelRef} visible={false}>
+      <ModelAsset path="/3d-models/phone.glb" size={0.74} castShadow={false} />
+    </group>
+  );
+}
+
 function Workspace({
   onSelect,
   monitorFocused,
@@ -42,6 +100,7 @@ function Workspace({
   onCloseGuestbookComposer,
   guestbookComposerOpen,
   guideTarget,
+  phoneForegroundTransformRef,
 }: {
   onSelect: (category: ProjectCategory, projectId?: string) => void;
   monitorFocused: boolean;
@@ -55,6 +114,7 @@ function Workspace({
   onCloseGuestbookComposer: () => void;
   guestbookComposerOpen: boolean;
   guideTarget: SceneGuideTarget | null;
+  phoneForegroundTransformRef: { current: PhoneForegroundTransform };
 }) {
   const camera = useThree((state) => state.camera);
   const invalidate = useThree((state) => state.invalidate);
@@ -172,6 +232,7 @@ function Workspace({
             guideDimmed={guideTarget !== null && guideTarget !== "phone"}
             onFocus={onFocusPhone}
             onSelect={(projectId) => onSelect("app", projectId)}
+            foregroundTransformRef={phoneForegroundTransformRef}
           />
           <Monitor
             focused={monitorFocused}
@@ -363,6 +424,18 @@ export function DeskScene({
   const [guestbookComposerOpen, setGuestbookComposerOpen] = useState(false);
   const [resumeOpen, setResumeOpen] = useState(false);
   const [sceneVisible, setSceneVisible] = useState(false);
+  const cameraSnapshotRef = useRef<CameraSnapshot>({
+    position: new Vector3(...CAMERA_POSITION),
+    quaternion: new Quaternion(),
+    fov: 41,
+    near: 0.1,
+    far: 1000,
+  });
+  const phoneForegroundTransformRef = useRef<PhoneForegroundTransform>({
+    position: new Vector3(),
+    quaternion: new Quaternion(),
+    scale: new Vector3(1, 1, 1),
+  });
   const handleSelect = useCallback(
     (category: ProjectCategory, projectId?: string) => {
       onSelect(category, projectId);
@@ -409,6 +482,7 @@ export function DeskScene({
           transition: `opacity ${sceneVisible ? 500 : 0}ms ease-out`,
         }}
       >
+        <CameraSnapshotRecorder snapshot={cameraSnapshotRef} />
         <fog attach="fog" args={["#080a0e", 8, 14]} />
         <Suspense fallback={null}>
           <Workspace
@@ -451,9 +525,34 @@ export function DeskScene({
             }}
             onCloseGuestbookComposer={() => setGuestbookComposerOpen(false)}
             guideTarget={guideTarget}
+            phoneForegroundTransformRef={phoneForegroundTransformRef}
           />
         </Suspense>
       </Canvas>
+      {phoneFocused && sceneVisible && (
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 z-[500]"
+        >
+          <Canvas
+            frameloop="always"
+            dpr={1}
+            camera={{ position: CAMERA_POSITION, fov: 41 }}
+            gl={{ alpha: true, antialias: false, powerPreference: "high-performance" }}
+            onCreated={({ gl }) => gl.setClearColor("#000000", 0)}
+            style={{ background: "transparent" }}
+          >
+            <ambientLight intensity={1.15} />
+            <directionalLight position={[-2, 5, 4]} intensity={1.25} />
+            <Suspense fallback={null}>
+              <ForegroundPhone
+                cameraSnapshot={cameraSnapshotRef}
+                transform={phoneForegroundTransformRef}
+              />
+            </Suspense>
+          </Canvas>
+        </div>
+      )}
       <AnimatePresence>
         {resumeOpen && <ResumeViewer onClose={() => setResumeOpen(false)} />}
       </AnimatePresence>
