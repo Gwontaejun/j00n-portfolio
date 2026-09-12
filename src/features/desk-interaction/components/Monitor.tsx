@@ -25,6 +25,8 @@ import {
 import {
   SiChartdotjs,
   SiCss,
+  SiFastapi,
+  SiGooglegemini,
   SiGithub,
   SiGreensock,
   SiHtml5,
@@ -41,6 +43,7 @@ import {
   SiTailwindcss,
   SiThreedotjs,
   SiTypescript,
+  SiYoutube,
 } from "react-icons/si";
 import { FaSlack } from "react-icons/fa6";
 import { GiBearFace } from "react-icons/gi";
@@ -84,6 +87,9 @@ const skillIcons: Record<string, { icon: IconType; color: string }> = {
   Slack: { icon: FaSlack, color: "#611f69" },
   GitHub: { icon: SiGithub, color: "#24292f" },
   "Chart.js": { icon: SiChartdotjs, color: "#ff6384" },
+  FastAPI: { icon: SiFastapi, color: "#009688" },
+  "YouTube API": { icon: SiYoutube, color: "#ff0000" },
+  Gemini: { icon: SiGooglegemini, color: "#4285f4" },
 };
 
 const featureIcons = [LuNetwork, LuFileText, LuLayoutGrid, LuShieldCheck];
@@ -472,147 +478,117 @@ export function Monitor({
                 </>
               ) : (
                 <>
-              <section className="relative flex min-h-[350px] flex-col overflow-hidden rounded-2xl border border-slate-900/8 bg-white/80 p-6 shadow-[0_16px_45px_rgba(71,85,105,.10)]">
-                <div className="pointer-events-none absolute -right-12 -top-14 size-44 rounded-full border border-indigo-400/10" />
-                <div className="pointer-events-none absolute -right-4 -top-7 size-28 rounded-full border border-indigo-400/15" />
-                <div className="relative flex items-center gap-4">
-                  <Image
-                    src={selectedProject.image}
-                    alt={`${selectedProject.title} 아이콘`}
-                    width={72}
-                    height={72}
-                    className="size-[72px] rounded-[20px] object-cover shadow-[0_18px_50px_rgba(0,0,0,.35)]"
-                  />
-                  <div>
-                    <div className="mb-2 flex items-center gap-2 text-[8px]">
-                      <span
-                        className={`size-1.5 rounded-full ${
-                          selectedProject.projectType === "실무 프로젝트"
-                            ? "bg-blue-500"
-                            : "bg-emerald-400"
-                        }`}
+                  <section className="relative flex min-h-[350px] flex-col overflow-hidden rounded-2xl border border-slate-900/8 bg-white/80 p-6 shadow-[0_16px_45px_rgba(71,85,105,.10)]">
+                    <div className="pointer-events-none absolute -right-12 -top-14 size-44 rounded-full border border-indigo-400/10" />
+                    <div className="pointer-events-none absolute -right-4 -top-7 size-28 rounded-full border border-indigo-400/15" />
+                    <div className="relative flex items-center gap-4">
+                      <Image
+                        src={selectedProject.image}
+                        alt={`${selectedProject.title} 아이콘`}
+                        width={72}
+                        height={72}
+                        className="size-[72px] rounded-[20px] object-cover shadow-[0_18px_50px_rgba(0,0,0,.35)]"
                       />
-                      <span
-                        className={`tracking-[.1em] ${
-                          selectedProject.projectType === "실무 프로젝트"
-                            ? "text-blue-700/75"
-                            : "text-emerald-700/75"
-                        }`}
-                      >
-                        {selectedProject.projectType === "실무 프로젝트"
-                          ? [selectedProject.organization, selectedProject.period]
-                              .filter(Boolean)
-                              .join(" · ")
-                          : "서비스 운영 중"}
-                      </span>
-                    </div>
-                    <div className="flex items-baseline gap-3 whitespace-nowrap">
-                      <h3
-                        className={`font-semibold tracking-[-.03em] ${
-                          selectedProject.projectType === "실무 프로젝트"
-                            ? "text-[22px]"
-                            : "text-[29px]"
-                        }`}
-                      >
-                        {selectedProject.title}
-                      </h3>
-                      <span
-                        className="text-[12px] text-slate-900/25"
-                        aria-hidden="true"
-                      >
-                        |
-                      </span>
-                      <p className="text-[9px] tracking-[.08em] text-[#172033]">
-                        {selectedProject.subtitle ?? "웹 프로젝트"}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-                <p className="relative mt-6 text-[8px] font-medium tracking-[.16em] text-slate-600">
-                  프로젝트 소개
-                </p>
-                <p className="relative mt-2 max-w-[520px] text-[10px] leading-[1.85] text-slate-700">
-                  {selectedProject.description}
-                </p>
-                {(selectedProject.href || selectedProject.repositoryHref) && (
-                  <div className="relative mt-auto flex gap-2 pt-6">
-                  {selectedProject.href && (
-                    <a
-                      href={selectedProject.href}
-                      target="_blank"
-                      rel="noreferrer"
-                      onClick={(event) => event.stopPropagation()}
-                      className="inline-flex items-center gap-2 rounded-lg bg-[#202a3a] px-3 py-2.5 text-[9px] font-semibold text-white transition hover:bg-[#303d52]"
-                    >
-                      <LuExternalLink size={11} />
-                      프로젝트 열기
-                    </a>
-                  )}
-                  {selectedProject.repositoryHref && (
-                    <a
-                      href={selectedProject.repositoryHref}
-                      target="_blank"
-                      rel="noreferrer"
-                      onClick={(event) => event.stopPropagation()}
-                      className="inline-flex items-center gap-2 rounded-lg border border-slate-900/10 bg-white/70 px-3 py-2.5 text-[9px] font-medium text-slate-700 transition hover:border-slate-900/20 hover:bg-white"
-                    >
-                      <SiGithub size={11} />
-                      GitHub
-                    </a>
-                  )}
-                  </div>
-                )}
-              </section>
-              <aside className="min-h-[350px] rounded-2xl border border-slate-900/8 bg-white/60 p-5 shadow-[0_16px_45px_rgba(71,85,105,.08)]">
-                <div className="flex items-center justify-between">
-                  <p className="text-[9px] font-medium text-slate-800">
-                    사용 기술
-                  </p>
-                  <span className="text-[7px] text-slate-500">
-                    {selectedProject.technologies.length} SKILLS
-                  </span>
-                </div>
-                <div className="mt-4 grid grid-cols-2 gap-2">
-                  {selectedProject.technologies.map((technology) => (
-                    <SkillBadge key={technology} name={technology} />
-                  ))}
-                </div>
-                {selectedProject.features && (
-                  <div className="mt-5 border-t border-slate-900/8 pt-4">
-                    <p className="text-[9px] font-medium text-slate-800">
-                      주요 기능
-                    </p>
-                    <div className="mt-3 space-y-2.5">
-                      {selectedProject.features.map((feature, index) => {
-                        const FeatureIcon =
-                          featureIcons[index % featureIcons.length];
-                        return (
-                          <div
-                            key={feature.title}
-                            className="flex items-start gap-2.5"
+                      <div>
+                        <div className="mb-2 flex items-center gap-2 text-[8px]">
+                          <span className="size-1.5 rounded-full bg-emerald-400" />
+                          <span className="tracking-[.1em] text-emerald-700/75">
+                            서비스 운영 중
+                          </span>
+                        </div>
+                        <div className="flex items-baseline gap-3 whitespace-nowrap">
+                          <h3 className="text-[29px] font-semibold tracking-[-.03em]">
+                            {selectedProject.title}
+                          </h3>
+                          <span
+                            className="text-[12px] text-slate-900/25"
+                            aria-hidden="true"
                           >
-                            <span className="mt-0.5 grid size-5 shrink-0 place-items-center rounded-md bg-indigo-500/10">
-                              <FeatureIcon
-                                size={11}
-                                className="text-indigo-600/75"
-                                aria-hidden="true"
-                              />
-                            </span>
-                            <div>
-                              <p className="text-[8px] font-medium text-slate-700">
-                                {feature.title}
-                              </p>
-                              <p className="mt-0.5 text-[7px] leading-3 text-slate-500">
-                                {feature.description}
-                              </p>
-                            </div>
-                          </div>
-                        );
-                      })}
+                            |
+                          </span>
+                          <p className="text-[9px] tracking-[.08em] text-[#172033]">
+                            {selectedProject.subtitle ?? "웹 프로젝트"}
+                          </p>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                )}
-              </aside>
+                    <p className="relative mt-6 text-[8px] font-medium tracking-[.16em] text-slate-600">
+                      프로젝트 소개
+                    </p>
+                    <p className="relative mt-2 max-w-[520px] text-[10px] leading-[1.85] text-slate-700">
+                      {selectedProject.description}
+                    </p>
+                    {(selectedProject.href || selectedProject.repositoryHref) && (
+                      <div className="relative mt-auto flex gap-2 pt-6">
+                        {selectedProject.href && (
+                          <a
+                            href={selectedProject.href}
+                            target="_blank"
+                            rel="noreferrer"
+                            onClick={(event) => event.stopPropagation()}
+                            className="inline-flex items-center gap-2 rounded-lg bg-[#202a3a] px-3 py-2.5 text-[9px] font-semibold text-white transition hover:bg-[#303d52]"
+                          >
+                            <LuExternalLink size={11} />
+                            프로젝트 열기
+                          </a>
+                        )}
+                        {selectedProject.repositoryHref && (
+                          <a
+                            href={selectedProject.repositoryHref}
+                            target="_blank"
+                            rel="noreferrer"
+                            onClick={(event) => event.stopPropagation()}
+                            className="inline-flex items-center gap-2 rounded-lg border border-slate-900/10 bg-white/70 px-3 py-2.5 text-[9px] font-medium text-slate-700 transition hover:border-slate-900/20 hover:bg-white"
+                          >
+                            <SiGithub size={11} />
+                            GitHub
+                          </a>
+                        )}
+                      </div>
+                    )}
+                  </section>
+                  <aside className="min-h-[350px] rounded-2xl border border-slate-900/8 bg-white/60 p-5 shadow-[0_16px_45px_rgba(71,85,105,.08)]">
+                    <div className="flex items-center justify-between">
+                      <p className="text-[9px] font-medium text-slate-800">사용 기술</p>
+                      <span className="text-[7px] text-slate-500">
+                        {selectedProject.technologies.length} SKILLS
+                      </span>
+                    </div>
+                    <div className="mt-4 grid grid-cols-2 gap-2">
+                      {selectedProject.technologies.map((technology) => (
+                        <SkillBadge key={technology} name={technology} />
+                      ))}
+                    </div>
+                    {selectedProject.features && (
+                      <div className="mt-5 border-t border-slate-900/8 pt-4">
+                        <p className="text-[9px] font-medium text-slate-800">주요 기능</p>
+                        <div className="mt-3 space-y-2.5">
+                          {selectedProject.features.map((feature, index) => {
+                            const FeatureIcon = featureIcons[index % featureIcons.length];
+                            return (
+                              <div key={feature.title} className="flex items-start gap-2.5">
+                                <span className="mt-0.5 grid size-5 shrink-0 place-items-center rounded-md bg-indigo-500/10">
+                                  <FeatureIcon
+                                    size={11}
+                                    className="text-indigo-600/75"
+                                    aria-hidden="true"
+                                  />
+                                </span>
+                                <div>
+                                  <p className="text-[8px] font-medium text-slate-700">
+                                    {feature.title}
+                                  </p>
+                                  <p className="mt-0.5 text-[7px] leading-3 text-slate-500">
+                                    {feature.description}
+                                  </p>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+                  </aside>
                 </>
               )}
               </div>

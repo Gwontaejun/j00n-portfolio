@@ -1,20 +1,107 @@
+<div align="center">
+
 # J00N Portfolio
 
-개발자 권태준의 웹·모바일 프로젝트를 실제 작업 책상처럼 둘러보는 3D 포트폴리오입니다.
+### Frontend Developer · 권태준
+
+실제 작업 공간을 둘러보듯 웹·모바일 프로젝트와 개발 경험을 탐색하는 3D 포트폴리오입니다.
+
+<br />
+
+![J00N Portfolio 작업 공간](./public/screenshot/전체%20캡처1.PNG)
+
+</div>
+
+## 프로젝트 소개
+
+J00N Portfolio는 단순한 프로젝트 목록 대신 개발자의 책상을 하나의 인터페이스로 구성했습니다. 모니터에서는 실무·사이드 프로젝트와 프로필을 확인하고, 휴대폰에서는 모바일 앱을 살펴볼 수 있습니다. 코르크보드에는 이력서와 방문자가 남긴 방명록이 포스트잇 형태로 표시됩니다.
+
+화면 속 기기와 오브젝트는 React Three Fiber로 렌더링하며, 실제 정보 화면은 Drei `Html`과 React UI를 결합해 선명도와 상호작용을 유지합니다.
+
+> 3D 오브젝트와 넓은 화면 구성을 온전히 경험하려면 가로 1400px 이상의 데스크톱 환경을 권장합니다. 1400px 미만에서는 별도의 데스크톱 접속 안내 화면을 제공합니다.
+
+## 주요 경험
+
+### 모니터 · 웹 프로젝트 탐색
+
+Windows 데스크톱을 모티브로 구성한 모니터에서 실무 프로젝트와 사이드 프로젝트를 폴더로 구분해 탐색할 수 있습니다. 프로젝트 상세 화면에서는 소개, 기술 스택, 주요 기능과 외부 링크를 확인합니다.
+
+![Orbit 프로젝트 상세 화면](./public/screenshot/모니터%20캡처1.PNG)
+
+### 프로필 · 경력과 기술
+
+프로필 창에서는 경력, 주요 업무 경험, 학력, 자격증, 기술 스택과 협업 도구를 확인할 수 있습니다. 왼쪽 프로필 카드는 고정하고 오른쪽 상세 정보만 스크롤되도록 구성했습니다.
+
+![프로필 상세 화면](./public/screenshot/모니터%20캡처2.PNG)
+
+### 데스크톱형 프로젝트 브라우저
+
+프로필과 프로젝트 폴더는 바탕화면과 작업표시줄에서 열고 최소화하거나 다시 복원할 수 있습니다. 여러 창은 사용자가 직접 닫기 전까지 실행 상태를 유지합니다.
+
+![모니터 기본 화면](./public/screenshot/모니터%20캡처3.PNG)
+
+### 휴대폰 · 앱 프로젝트
+
+휴대폰을 선택하면 모델이 사용자 앞으로 이동해 정면을 향합니다. Android 화면 문법을 기반으로 앱 소개, 기술 스택, 주요 기능과 스토어·GitHub 링크를 제공합니다.
+
+![Duck Routine 앱 상세 화면](./public/screenshot/모바일%20캡처1.PNG)
+
+### 코르크보드 · 프로필과 방명록
+
+코르크보드에는 프로필 미리보기와 방명록이 배치됩니다. 방명록은 로그인 없이 작성할 수 있으며, Supabase에 저장된 메시지를 포스트잇 형태로 불러옵니다.
+
+![코르크보드 방명록 화면](./public/screenshot/보드%20캡처1.PNG)
+
+## 주요 기능
+
+- GLB 모델을 활용한 개발자 작업 공간과 비 오는 창문 연출
+- 모니터·휴대폰·코르크보드로 연결되는 오브젝트 중심 탐색
+- 카메라 및 휴대폰 모델의 부드러운 포커스·복귀 애니메이션
+- Windows 스타일 프로젝트 브라우저와 Android 스타일 앱 화면
+- 실무 프로젝트, 사이드 프로젝트, 앱 프로젝트 데이터 분리
+- 경력·업무 경험·기술 스택을 담은 프로필 화면
+- Supabase와 Next.js Route Handler 기반 익명 방명록
+- 처음 방문한 사용자를 위한 단계별 3D 오브젝트 가이드
+- 모바일·좁은 화면의 불필요한 3D 로딩을 차단하는 접속 안내
+
+## 기술 스택
+
+- **Framework:** Next.js 16 App Router, React 19, TypeScript
+- **3D:** Three.js, React Three Fiber, `@react-three/drei`
+- **UI:** Tailwind CSS 4, Framer Motion, React Icons
+- **Data:** Supabase, Next.js Route Handler
+- **Deployment:** Vercel
 
 ## 실행 방법
 
-필요 환경:
+### 요구 환경
 
 - Node.js 22.13 이상
 - npm
+
+### 설치 및 실행
 
 ```bash
 npm install
 npm run dev
 ```
 
-브라우저에서 터미널에 표시된 로컬 주소를 엽니다.
+터미널에 표시된 로컬 주소를 가로 1400px 이상의 브라우저에서 엽니다.
+
+### 환경변수
+
+프로젝트 루트의 `.env`에 Supabase 연결 정보를 설정합니다.
+
+```dotenv
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your_publishable_key
+SUPABASE_SECRET_KEY=your_secret_key
+
+# 선택 사항: 방문자별 방명록 등록 제한 해시에 사용할 별도 값
+GUESTBOOK_HASH_SALT=your_random_salt
+```
+
+`SUPABASE_SECRET_KEY`는 방명록 등록 Route Handler에서만 사용하며 브라우저에 노출하지 않습니다.
 
 ## 검증 명령
 
@@ -24,30 +111,51 @@ npm run lint
 npm run build
 ```
 
-이 프로젝트는 공식 Next.js App Router와 Next.js CLI를 사용합니다. 개발·빌드·실행은 위 npm 스크립트를 사용합니다.
-
-## 주요 구조
+## 프로젝트 구조
 
 ```text
-app/                              # App Router 진입점과 전역 스타일
-src/data/projects.ts              # 웹/앱 프로젝트 데이터
-src/types/project.ts              # 프로젝트 타입
-src/features/desk-interaction/    # 3D 책상과 기기 상호작용
-src/features/project-browser/     # 인트로와 보조 프로젝트 UI
-src/shared/                       # 공용 훅과 유틸리티
-public/3d-models/                 # GLB 모델
-public/web-project/               # 웹 프로젝트 이미지
-public/app-project/               # 앱 프로젝트 이미지
-public/textures/                  # 배경 및 장면 텍스처
-docs/PROJECT_STATE.md             # 현재 구현 상태와 인수인계 기록
-AGENTS.md                         # AI 작업 규칙
+app/
+├─ api/guestbook/                 # 방명록 조회·등록 Route Handler
+├─ layout.tsx                     # 전역 레이아웃과 메타데이터
+└─ page.tsx                       # 화면 크기 분기와 3D 씬 진입점
+
+src/
+├─ data/projects.ts               # 웹·실무·앱 프로젝트 데이터
+├─ features/
+│  ├─ desk-interaction/           # 3D 장면, 기기, 방과 카메라 상호작용
+│  ├─ guestbook/                  # 방명록 UI와 데이터 타입
+│  └─ project-browser/            # 인트로, 가이드, 모바일 안내
+├─ shared/                        # 공용 훅과 Supabase 서버 클라이언트
+└─ types/                         # 프로젝트와 장면 타입
+
+public/
+├─ 3d-models/                     # 책상과 기기 GLB 모델
+├─ app-project/                   # 앱 프로젝트 이미지
+├─ web-project/                   # 웹 프로젝트 이미지
+├─ screenshot/                    # README 화면 이미지
+└─ textures/                      # 장면 텍스처
 ```
+
+## 프로젝트 데이터 추가
+
+프로젝트 콘텐츠는 UI 코드와 분리되어 있습니다.
+
+- 프로젝트 타입: `src/types/project.ts`
+- 프로젝트 데이터: `src/data/projects.ts`
+- 프로젝트 이미지: `public/web-project`, `public/app-project`
+
+데이터 배열에 프로젝트 정보를 추가하면 모니터 또는 휴대폰 UI에 자동으로 연결됩니다.
 
 ## 다른 컴퓨터에서 이어서 작업하기
 
-1. 현재 변경 사항을 커밋하고 원격 저장소에 푸시합니다.
-2. 다른 컴퓨터에서 저장소를 clone 또는 pull 합니다.
-3. `npm install` 후 `npm run dev`를 실행합니다.
-4. 새 AI 대화에서는 먼저 `AGENTS.md`와 `docs/PROJECT_STATE.md`를 읽도록 요청합니다.
+1. 변경 사항을 커밋하고 원격 저장소에 푸시합니다.
+2. 다른 컴퓨터에서 저장소를 clone하거나 pull합니다.
+3. `.env`를 별도로 설정합니다.
+4. `npm install` 후 `npm run dev`를 실행합니다.
+5. 저장소의 `AGENTS.md`와 `docs/PROJECT_STATE.md`를 기준으로 현재 구현 상태를 확인합니다.
 
-필수 환경변수는 현재 없습니다. 프로젝트 결정이나 미완료 작업이 바뀌면 같은 커밋에서 `docs/PROJECT_STATE.md`도 갱신합니다.
+---
+
+<div align="center">
+  <strong>J00N · Frontend Developer</strong>
+</div>

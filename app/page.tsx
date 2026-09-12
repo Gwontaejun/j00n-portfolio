@@ -3,7 +3,7 @@
 import dynamic from "next/dynamic";
 import { useCallback, useEffect, useState } from "react";
 import { IntroOverlay } from "@/features/project-browser/components/IntroOverlay";
-import { ProjectPanel } from "@/features/project-browser/components/ProjectPanel";
+import { MobileExperienceNotice } from "@/features/project-browser/components/MobileExperienceNotice";
 import { SceneGuide } from "@/features/project-browser/components/SceneGuide";
 import type { ProjectCategory } from "@/types/project";
 import type { SceneGuideTarget } from "@/types/scene-guide";
@@ -27,6 +27,7 @@ const DeskScene = dynamic(
 );
 
 export default function Home() {
+  const [isMobileViewport, setIsMobileViewport] = useState<boolean | null>(null);
   const [activeCategory, setActiveCategory] = useState<ProjectCategory | null>(
     null,
   );
@@ -37,6 +38,15 @@ export default function Home() {
   const [isSceneReady, setIsSceneReady] = useState(false);
   const [isGuideOpen, setIsGuideOpen] = useState(false);
   const [guideStepIndex, setGuideStepIndex] = useState(0);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(max-width: 1399px)");
+    const updateViewport = () => setIsMobileViewport(mediaQuery.matches);
+
+    updateViewport();
+    mediaQuery.addEventListener("change", updateViewport);
+    return () => mediaQuery.removeEventListener("change", updateViewport);
+  }, []);
 
   const openProjects = useCallback(
     (category: ProjectCategory, projectId?: string) => {
@@ -73,6 +83,14 @@ export default function Home() {
     setGuideStepIndex(0);
     setIsGuideOpen(true);
   }, []);
+
+  if (isMobileViewport === null) {
+    return <main className="min-h-dvh bg-[#0d1016]" />;
+  }
+
+  if (isMobileViewport) {
+    return <MobileExperienceNotice />;
+  }
 
   return (
     <main className="relative min-h-dvh overflow-hidden bg-[#11141a] text-white">

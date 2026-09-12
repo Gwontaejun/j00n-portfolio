@@ -1,6 +1,10 @@
 # 프로젝트 상태 및 인수인계
 
-최종 갱신: 2026-08-28
+최종 갱신: 2026-09-13
+
+2026-09-13 사이드 프로젝트에 `Channelytics`를 추가했다. 공개 YouTube 데이터를 기반으로 영상 댓글과 채널 성과를 분석하는 Next.js·FastAPI 서비스이며, 저장소의 공식 아이콘과 서비스·GitHub 링크를 사용한다.
+
+가로 폭이 1400px 미만인 모바일·좁은 화면에서는 무거운 3D 책상 씬을 렌더링하지 않고 데스크톱 접속 권장 안내를 표시한다. 안내 화면에서 포트폴리오의 데스크톱 최적화 이유와 권장 해상도를 확인하고 GitHub 프로필로 이동할 수 있다.
 
 2026-08-28 배포 준비 과정에서 Vite 기반 `vinext` 실행 환경을 공식 Next.js CLI로 전환했다. `npm run dev`, `npm run build`, `npm run start`는 각각 `next dev`, `next build`, `next start`를 실행하며 Vite·Cloudflare·OpenAI Sites 전용 설정과 의존성은 제거했다. 배포 대상은 Vercel이다.
 
@@ -31,7 +35,7 @@ Tailwind CSS 4는 `postcss.config.mjs`에서 `@tailwindcss/postcss` 플러그인
 ### 웹 프로젝트
 
 - 모니터 바탕화면에서 웹 프로젝트를 직접 나열하지 않고 `실무 프로젝트`, `사이드 프로젝트` 폴더로 구분한다. 폴더는 바탕화면을 유지한 채 중앙에 작은 탐색기 창으로 열리며, 프로젝트 상세 창만 모니터 화면을 넓게 사용한다.
-- `사이드 프로젝트` 폴더에는 기존 Orbit이 표시된다. `실무 프로젝트` 폴더에는 이력서 Projects 항목을 바탕으로 SKT Litmus+, LG HRDX Career Advisor ADMIN, LG HRDX Career Advisor, 42dot 홈페이지, 이마트 EV 충전 관제, LG EV 충전 관제 프로젝트를 표시한다. 실무 프로젝트는 외부 공개 링크와 GitHub 링크 없이 회사·기간·설명·기술·주요 기능만 제공한다.
+- `사이드 프로젝트` 폴더에는 Orbit과 Channelytics가 표시된다. `실무 프로젝트` 폴더에는 이력서 Projects 항목을 바탕으로 SKT Litmus+, LG HRDX Career Advisor ADMIN, LG HRDX Career Advisor, 42dot 홈페이지, 이마트 EV 충전 관제, LG EV 충전 관제 프로젝트를 표시한다. 실무 프로젝트는 외부 공개 링크와 GitHub 링크 없이 회사·기간·설명·기술·주요 기능만 제공한다.
 - 실무 프로젝트 상세는 사이드 프로젝트와 다른 이력형 레이아웃을 사용한다. 왼쪽에는 프로젝트명, 소속, 참여 기간, 개요와 기술 태그를 배치하고 오른쪽에는 담당 기능과 기여를 카드로 보여준다.
 - 작업표시줄에는 프로필 아이콘을 기본으로 고정한다. 폴더 아이콘은 기본 고정하지 않고 실제로 열면 탐색기 아이콘 하나가 나타나며, 최소화 중에는 유지되고 닫으면 사라진다. 현재 실행 중인 프로젝트 아이콘도 함께 표시하고 검색창에서는 폴더 구분과 관계없이 프로젝트를 바로 검색할 수 있다.
 - 폴더 창과 프로젝트 창은 다른 창을 열어도 자동으로 닫히지 않는다. 새로 선택하거나 클릭한 창이 앞으로 올라오며, 각 창의 최소화 또는 닫기 동작을 사용했을 때만 해당 창을 숨긴다.
@@ -42,7 +46,7 @@ Tailwind CSS 4는 `postcss.config.mjs`에서 `@tailwindcss/postcss` 플러그인
 - 서비스: https://orbit-notes.vercel.app/
 - GitHub: https://github.com/Gwontaejun/orbit
 - 대표 기술: React, TypeScript, Three.js, React Three Fiber, Tiptap, Supabase
-- 현재 웹 프로젝트는 Orbit 하나만 노출한다.
+- 현재 사이드 프로젝트는 Orbit과 Channelytics를 노출한다.
 
 ### 앱 프로젝트
 
