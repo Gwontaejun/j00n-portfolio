@@ -6,10 +6,6 @@
 
 실제 작업 공간을 둘러보듯 웹·모바일 프로젝트와 개발 경험을 탐색하는 3D 포트폴리오입니다.
 
-<br />
-
-![J00N Portfolio 작업 공간](./public/screenshot/전체%20캡처1.PNG)
-
 </div>
 
 ## 프로젝트 소개
@@ -19,6 +15,45 @@ J00N Portfolio는 단순한 프로젝트 목록 대신 개발자의 책상을 �
 화면 속 기기와 오브젝트는 React Three Fiber로 렌더링하며, 실제 정보 화면은 Drei `Html`과 React UI를 결합해 선명도와 상호작용을 유지합니다.
 
 > 3D 오브젝트와 넓은 화면 구성을 온전히 경험하려면 가로 1400px 이상의 데스크톱 환경을 권장합니다. 1400px 미만에서는 별도의 데스크톱 접속 안내 화면을 제공합니다.
+
+## 프리뷰
+
+![J00N Portfolio 작업 공간](./public/screenshot/전체%20캡처1.PNG)
+
+## 기술 스택
+
+### Frontend
+
+<p>
+  <img src="https://img.shields.io/badge/Next.js-16-000000?style=flat-square&logo=nextdotjs&logoColor=white" alt="Next.js" />
+  <img src="https://img.shields.io/badge/React-19-61DAFB?style=flat-square&logo=react&logoColor=white" alt="React" />
+  <img src="https://img.shields.io/badge/TypeScript-5-3178C6?style=flat-square&logo=typescript&logoColor=white" alt="TypeScript" />
+  <img src="https://img.shields.io/badge/Tailwind_CSS-4-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white" alt="Tailwind CSS" />
+</p>
+
+### 3D & Interaction
+
+<p>
+  <img src="https://img.shields.io/badge/Three.js-0.185-000000?style=flat-square&logo=threedotjs&logoColor=white" alt="Three.js" />
+  <img src="https://img.shields.io/badge/React_Three_Fiber-9-20232A?style=flat-square&logo=react&logoColor=61DAFB" alt="React Three Fiber" />
+  <img src="https://img.shields.io/badge/React_Three_Drei-10-20232A?style=flat-square&logo=react&logoColor=61DAFB" alt="React Three Drei" />
+  <img src="https://img.shields.io/badge/Framer_Motion-13-0055FF?style=flat-square&logo=framer&logoColor=white" alt="Framer Motion" />
+</p>
+
+### Data & Deployment
+
+<p>
+  <img src="https://img.shields.io/badge/Supabase-2-3FCF8E?style=flat-square&logo=supabase&logoColor=white" alt="Supabase" />
+  <img src="https://img.shields.io/badge/Next.js_Route_Handlers-16-000000?style=flat-square&logo=nextdotjs&logoColor=white" alt="Next.js Route Handlers" />
+  <img src="https://img.shields.io/badge/Vercel-Deployed-000000?style=flat-square&logo=vercel&logoColor=white" alt="Vercel" />
+</p>
+
+### Code Quality
+
+<p>
+  <img src="https://img.shields.io/badge/TypeScript-Strict-3178C6?style=flat-square&logo=typescript&logoColor=white" alt="TypeScript Strict Mode" />
+  <img src="https://img.shields.io/badge/ESLint-9-4B32C3?style=flat-square&logo=eslint&logoColor=white" alt="ESLint" />
+</p>
 
 ## 주요 경험
 
@@ -64,53 +99,6 @@ Windows 데스크톱을 모티브로 구성한 모니터에서 실무 프로젝�
 - 처음 방문한 사용자를 위한 단계별 3D 오브젝트 가이드
 - 모바일·좁은 화면의 불필요한 3D 로딩을 차단하는 접속 안내
 
-## 기술 스택
-
-- **Framework:** Next.js 16 App Router, React 19, TypeScript
-- **3D:** Three.js, React Three Fiber, `@react-three/drei`
-- **UI:** Tailwind CSS 4, Framer Motion, React Icons
-- **Data:** Supabase, Next.js Route Handler
-- **Deployment:** Vercel
-
-## 실행 방법
-
-### 요구 환경
-
-- Node.js 22.13 이상
-- npm
-
-### 설치 및 실행
-
-```bash
-npm install
-npm run dev
-```
-
-터미널에 표시된 로컬 주소를 가로 1400px 이상의 브라우저에서 엽니다.
-
-### 환경변수
-
-프로젝트 루트의 `.env`에 Supabase 연결 정보를 설정합니다.
-
-```dotenv
-NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
-NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your_publishable_key
-SUPABASE_SECRET_KEY=your_secret_key
-
-# 선택 사항: 방문자별 방명록 등록 제한 해시에 사용할 별도 값
-GUESTBOOK_HASH_SALT=your_random_salt
-```
-
-`SUPABASE_SECRET_KEY`는 방명록 등록 Route Handler에서만 사용하며 브라우저에 노출하지 않습니다.
-
-## 검증 명령
-
-```bash
-npm run typecheck
-npm run lint
-npm run build
-```
-
 ## 프로젝트 구조
 
 ```text
@@ -135,24 +123,6 @@ public/
 ├─ screenshot/                    # README 화면 이미지
 └─ textures/                      # 장면 텍스처
 ```
-
-## 프로젝트 데이터 추가
-
-프로젝트 콘텐츠는 UI 코드와 분리되어 있습니다.
-
-- 프로젝트 타입: `src/types/project.ts`
-- 프로젝트 데이터: `src/data/projects.ts`
-- 프로젝트 이미지: `public/web-project`, `public/app-project`
-
-데이터 배열에 프로젝트 정보를 추가하면 모니터 또는 휴대폰 UI에 자동으로 연결됩니다.
-
-## 다른 컴퓨터에서 이어서 작업하기
-
-1. 변경 사항을 커밋하고 원격 저장소에 푸시합니다.
-2. 다른 컴퓨터에서 저장소를 clone하거나 pull합니다.
-3. `.env`를 별도로 설정합니다.
-4. `npm install` 후 `npm run dev`를 실행합니다.
-5. 저장소의 `AGENTS.md`와 `docs/PROJECT_STATE.md`를 기준으로 현재 구현 상태를 확인합니다.
 
 ---
 
