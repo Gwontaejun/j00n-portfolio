@@ -19,15 +19,20 @@ const a2z = localFont({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://j00n-frontend.vercel.app"),
   title: "J00N | Frontend Developer",
   description:
     "웹과 모바일 앱을 만드는 개발자 J00N의 인터랙티브 작업 책상 포트폴리오",
+  alternates: {
+    canonical: "/",
+  },
   verification: {
     google: "EUkzPRKaytgem17e9RrYysm77hcYngPVUp-2OSXl-IM",
   },
   openGraph: {
     title: "J00N | Frontend Developer",
     description: "모니터와 휴대폰을 눌러 프로젝트를 살펴보세요.",
+    url: "/",
     type: "website",
   },
   twitter: {
