@@ -4,6 +4,10 @@ import dynamic from "next/dynamic";
 import { useCallback, useEffect, useState } from "react";
 import { IntroOverlay } from "@/features/project-browser/components/IntroOverlay";
 import { MobileExperienceNotice } from "@/features/project-browser/components/MobileExperienceNotice";
+import {
+  PortfolioBrand,
+  PortfolioLoader,
+} from "@/features/project-browser/components/PortfolioLoader";
 import { SceneGuide } from "@/features/project-browser/components/SceneGuide";
 import type { ProjectCategory } from "@/types/project";
 import type { SceneGuideTarget } from "@/types/scene-guide";
@@ -36,6 +40,7 @@ export default function Home() {
   );
   const [isMonitorFocused, setIsMonitorFocused] = useState(false);
   const [isSceneReady, setIsSceneReady] = useState(false);
+  const [isExperienceVisible, setIsExperienceVisible] = useState(false);
   const [isGuideOpen, setIsGuideOpen] = useState(false);
   const [guideStepIndex, setGuideStepIndex] = useState(0);
 
@@ -80,13 +85,13 @@ export default function Home() {
 
   const handleSceneReady = useCallback(() => {
     setIsSceneReady(true);
+  }, []);
+
+  const handleLoaderComplete = useCallback(() => {
+    setIsExperienceVisible(true);
     setGuideStepIndex(0);
     setIsGuideOpen(true);
   }, []);
-
-  if (isMobileViewport === null) {
-    return <main className="min-h-dvh bg-[#0d1016]" />;
-  }
 
   if (isMobileViewport) {
     return <MobileExperienceNotice />;
@@ -94,24 +99,36 @@ export default function Home() {
 
   return (
     <main className="relative min-h-dvh overflow-hidden bg-[#11141a] text-white">
-      <section aria-label="3D 작업 책상" className="absolute inset-0">
-        <DeskScene
-          onSelect={openProjects}
-          onMonitorFocusChange={setIsMonitorFocused}
-          onSceneReady={handleSceneReady}
-          guideTarget={isGuideOpen ? GUIDE_TARGETS[guideStepIndex] : null}
-        />
-      </section>
-      <IntroOverlay
-        hidden={!isSceneReady || isMonitorFocused}
-        onOpenGuide={openGuide}
+      <PortfolioLoader
+        sceneReady={isSceneReady}
+        onComplete={handleLoaderComplete}
       />
-      <SceneGuide
-        open={isGuideOpen}
-        stepIndex={guideStepIndex}
-        onStepChange={setGuideStepIndex}
-        onClose={closeGuide}
-      />
+      {isMobileViewport === false && (
+        <>
+          <section aria-label="3D 작업 책상" className="absolute inset-0">
+            <DeskScene
+              onSelect={openProjects}
+              onMonitorFocusChange={setIsMonitorFocused}
+              onSceneReady={handleSceneReady}
+              visible={isExperienceVisible}
+              guideTarget={isGuideOpen ? GUIDE_TARGETS[guideStepIndex] : null}
+            />
+          </section>
+          <PortfolioBrand
+            hidden={!isExperienceVisible || isMonitorFocused}
+          />
+          <IntroOverlay
+            hidden={!isExperienceVisible || isMonitorFocused}
+            onOpenGuide={openGuide}
+          />
+          <SceneGuide
+            open={isGuideOpen}
+            stepIndex={guideStepIndex}
+            onStepChange={setGuideStepIndex}
+            onClose={closeGuide}
+          />
+        </>
+      )}
     </main>
   );
 }

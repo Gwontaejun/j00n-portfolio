@@ -11,7 +11,7 @@ import {
   useProgress,
 } from "@react-three/drei";
 import { Group, MathUtils, MOUSE, PerspectiveCamera, Quaternion, Vector3 } from "three";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { AnimatePresence } from "framer-motion";
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 import { ModelAsset } from "./ModelAsset";
 import { DeskAccessories, DeskMoodLamp } from "./DeskAccessories";
@@ -283,139 +283,17 @@ function Workspace({
 }
 useGLTF.preload("/3d-models/computer-desk.glb");
 
-function SceneBranding({
-  hidden,
-  onReveal,
-}: {
-  hidden: boolean;
-  onReveal: () => void;
-}) {
-  const { active, progress } = useProgress();
-  const reduceMotion = useReducedMotion();
-  const [splashVisible, setSplashVisible] = useState(true);
-  const [exitComplete, setExitComplete] = useState(false);
-  const [typedCharacterCount, setTypedCharacterCount] = useState(0);
-
-  useEffect(() => {
-    if (active || progress < 100) return;
-
-    const characterDelay = reduceMotion ? 0 : 400;
-    const typingStartDelay = reduceMotion ? 0 : 180;
-    const timers = Array.from({ length: 4 }, (_, index) =>
-      window.setTimeout(
-        () => setTypedCharacterCount(index + 1),
-        typingStartDelay + index * characterDelay,
-      ),
-    );
-    const hideTimer = window.setTimeout(
-      () => setSplashVisible(false),
-      reduceMotion ? 100 : typingStartDelay + characterDelay * 3 + 1450,
-    );
-    return () => {
-      timers.forEach((timer) => window.clearTimeout(timer));
-      window.clearTimeout(hideTimer);
-    };
-  }, [active, progress, reduceMotion]);
-
-  const roundedProgress = Math.min(100, Math.max(0, Math.round(progress)));
-
-  return (
-    <>
-      <AnimatePresence
-        onExitComplete={() => {
-          setExitComplete(true);
-          onReveal();
-        }}
-      >
-        {splashVisible && (
-          <motion.div
-            aria-live="polite"
-            aria-label={`포트폴리오 로딩 중 ${roundedProgress}%`}
-            initial={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{
-              duration: reduceMotion ? 0.1 : 0.7,
-              ease: "easeInOut",
-            }}
-            className="pointer-events-auto absolute inset-0 z-[20000000] grid place-items-center bg-[radial-gradient(circle_at_50%_42%,#18202a_0%,#0b0e13_48%,#06080b_100%)] text-white"
-          >
-            <motion.div
-              initial={reduceMotion ? false : { opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
-              className="flex w-max flex-col items-center text-center"
-            >
-              <p
-                aria-label="J00N"
-                className="inline-flex items-baseline text-4xl font-semibold tracking-[-0.06em] sm:text-6xl"
-              >
-                <span aria-hidden="true">
-                  {"J00N".slice(0, typedCharacterCount)}
-                </span>
-                <motion.span
-                  aria-hidden="true"
-                  initial={{ opacity: reduceMotion ? 0 : 1 }}
-                  animate={{ opacity: reduceMotion ? 0 : [1, 1, 0, 0] }}
-                  transition={{
-                    duration: 0.85,
-                    delay: reduceMotion ? 0 : 0.95,
-                    repeat: reduceMotion ? 0 : Infinity,
-                    ease: "linear",
-                  }}
-                  className="ml-1 inline-block h-[0.78em] w-[2px] bg-white/75 sm:w-[3px]"
-                />
-              </p>
-              <motion.p
-                aria-hidden={typedCharacterCount !== 4}
-                initial={false}
-                animate={{
-                  opacity: typedCharacterCount === 4 ? 1 : 0,
-                  y: typedCharacterCount === 4 ? 0 : 3,
-                }}
-                transition={{
-                  duration: reduceMotion ? 0 : 0.45,
-                  delay: !reduceMotion && typedCharacterCount === 4 ? 0.3 : 0,
-                }}
-                className="mt-2 text-center text-[12px] font-medium tracking-[0.18em] text-white/55 [text-indent:0.18em] sm:text-[13px]"
-              >
-                Frontend Developer
-              </motion.p>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      <AnimatePresence>
-        {exitComplete && !hidden && (
-          <motion.div
-            initial={{ opacity: 0, x: -8 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -6 }}
-            transition={{ duration: reduceMotion ? 0.1 : 0.4 }}
-            className="pointer-events-none absolute left-5 top-5 z-[20000000] flex w-max flex-col items-center text-center text-white sm:left-8 sm:top-8"
-          >
-            <p className="text-[38px] font-semibold leading-none tracking-[-0.06em]">
-              J00N
-            </p>
-            <p className="mt-1.5 whitespace-nowrap text-center text-[9px] font-medium tracking-[0.16em] text-white/52 [text-indent:0.16em]">
-              Frontend Developer
-            </p>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </>
-  );
-}
-
 export function DeskScene({
   onSelect,
   onMonitorFocusChange,
   onSceneReady,
+  visible,
   guideTarget,
 }: {
   onSelect: (category: ProjectCategory, projectId?: string) => void;
   onMonitorFocusChange: (focused: boolean) => void;
   onSceneReady: () => void;
+  visible: boolean;
   guideTarget: SceneGuideTarget | null;
 }) {
   const [monitorFocused, setMonitorFocused] = useState(false);
@@ -423,7 +301,8 @@ export function DeskScene({
   const [guestbookFocused, setGuestbookFocused] = useState(false);
   const [guestbookComposerOpen, setGuestbookComposerOpen] = useState(false);
   const [resumeOpen, setResumeOpen] = useState(false);
-  const [sceneVisible, setSceneVisible] = useState(false);
+  const { active: assetsLoading, progress: assetProgress } = useProgress();
+  const sceneReadyReportedRef = useRef(false);
   const cameraSnapshotRef = useRef<CameraSnapshot>({
     position: new Vector3(...CAMERA_POSITION),
     quaternion: new Quaternion(),
@@ -461,6 +340,20 @@ export function DeskScene({
     onMonitorFocusChange(monitorFocused || phoneFocused || guestbookFocused);
   }, [monitorFocused, phoneFocused, guestbookFocused, onMonitorFocusChange]);
 
+  useEffect(() => {
+    if (
+      sceneReadyReportedRef.current ||
+      assetsLoading ||
+      assetProgress < 100
+    ) {
+      return;
+    }
+
+    sceneReadyReportedRef.current = true;
+    const frame = window.requestAnimationFrame(onSceneReady);
+    return () => window.cancelAnimationFrame(frame);
+  }, [assetProgress, assetsLoading, onSceneReady]);
+
   return (
     <div className="relative h-full w-full bg-[radial-gradient(circle_at_50%_32%,#252c38_0%,#101319_48%,#080a0e_100%)]">
       <Canvas
@@ -478,8 +371,8 @@ export function DeskScene({
           gl.shadowMap.needsUpdate = true;
         }}
         style={{
-          opacity: sceneVisible ? 1 : 0,
-          transition: `opacity ${sceneVisible ? 500 : 0}ms ease-out`,
+          opacity: visible ? 1 : 0,
+          transition: `opacity ${visible ? 500 : 0}ms ease-out`,
         }}
       >
         <CameraSnapshotRecorder snapshot={cameraSnapshotRef} />
@@ -529,7 +422,7 @@ export function DeskScene({
           />
         </Suspense>
       </Canvas>
-      {phoneFocused && sceneVisible && (
+      {phoneFocused && visible && (
         <div
           aria-hidden="true"
           className="pointer-events-none absolute inset-0 z-[500]"
@@ -556,15 +449,6 @@ export function DeskScene({
       <AnimatePresence>
         {resumeOpen && <ResumeViewer onClose={() => setResumeOpen(false)} />}
       </AnimatePresence>
-      <SceneBranding
-        hidden={
-          monitorFocused || phoneFocused || guestbookFocused || resumeOpen
-        }
-        onReveal={() => {
-          setSceneVisible(true);
-          onSceneReady();
-        }}
-      />
       {(monitorFocused || phoneFocused || guestbookFocused) && (
         <>
           <button
