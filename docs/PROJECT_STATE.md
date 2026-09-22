@@ -2,7 +2,7 @@
 
 최종 갱신: 2026-09-22
 
-2026-09-22 최초 진입 로딩 화면을 Three.js `DeskScene` 내부에서 분리해 `PortfolioLoader`로 이동했다. 페이지가 로딩 UI를 즉시 표시하고, `DeskScene`은 에셋 준비 완료 신호만 전달한다. 로딩 타이핑과 페이드아웃이 모두 끝난 뒤에만 Canvas를 공개하고 온보딩 가이드를 연다.
+2026-09-22 최초 진입 로딩 화면을 Three.js `DeskScene` 내부에서 분리해 `PortfolioLoader`로 이동했다. 페이지가 로딩 UI를 즉시 표시하고, `DeskScene`은 `useProgress` 퍼센트가 아니라 Suspense 장면이 실제 마운트된 뒤 준비 완료 신호를 한 번만 전달한다. 로딩 타이핑과 페이드아웃이 모두 끝난 뒤에만 Canvas를 공개하고 온보딩 가이드를 연다.
 
 2026-09-13 사이드 프로젝트에 `Channelytics`를 추가했다. 공개 YouTube 데이터를 기반으로 영상 댓글과 채널 성과를 분석하는 Next.js·FastAPI 서비스이며, 저장소의 공식 아이콘과 서비스·GitHub 링크를 사용한다.
 
@@ -22,7 +22,7 @@ Tailwind CSS 4는 `postcss.config.mjs`에서 `@tailwindcss/postcss` 플러그인
 
 브라우저 탭과 Open Graph·X 공유 메타데이터의 기본 제목은 `J00N | Frontend Developer`를 사용한다.
 
-인트로는 `src/features/project-browser/components/PortfolioLoader.tsx`에서 `J00N` 타이핑 후 `Frontend Developer`를 페이드인한다. `DeskScene`의 에셋 준비 완료 신호를 받은 뒤 애니메이션을 시작하고, 인트로가 완전히 사라진 다음 3D 장면을 보여준다. 메인 장면 좌측 상단 브랜드도 같은 파일의 독립된 `PortfolioBrand`가 담당한다.
+인트로는 `src/features/project-browser/components/PortfolioLoader.tsx`에서 Three.js 로딩과 동시에 `J00N` 타이핑을 시작하고 `Frontend Developer`를 페이드인한다. 입력이 끝났는데 장면이 아직 준비되지 않았다면 `책상 정리 중입니다...`를 표시하며, 준비되는 순간 해당 문구를 제거하고 인트로를 닫는다. 인트로가 완전히 사라진 다음에만 3D 장면을 보여준다. 메인 장면 좌측 상단 브랜드도 같은 파일의 독립된 `PortfolioBrand`가 담당한다.
 
 인트로가 끝날 때마다 4단계 온보딩 가이드를 표시한다. 모니터 → 휴대폰 → 프로필 → 방명록 순서이며 이전·다음 버튼으로 이동하고 마지막 `확인` 버튼 또는 ESC 키로 닫는다. 확인 여부는 브라우저 저장소에 기록하지 않으므로 페이지에 다시 진입하거나 새로고침하면 항상 표시된다. 책상 기본 화면 우측 상단의 도움말 아이콘을 누르면 언제든 1단계부터 가이드를 다시 열 수 있다.
 

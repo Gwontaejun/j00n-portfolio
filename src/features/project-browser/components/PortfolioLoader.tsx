@@ -17,8 +17,6 @@ export function PortfolioLoader({
   const [typedCharacterCount, setTypedCharacterCount] = useState(0);
 
   useEffect(() => {
-    if (!sceneReady) return;
-
     const characterDelay = reduceMotion ? 0 : 400;
     const typingStartDelay = reduceMotion ? 0 : 180;
     const timers = Array.from({ length: 4 }, (_, index) =>
@@ -27,16 +25,22 @@ export function PortfolioLoader({
         typingStartDelay + index * characterDelay,
       ),
     );
-    const hideTimer = window.setTimeout(
-      () => setVisible(false),
-      reduceMotion ? 100 : typingStartDelay + characterDelay * 3 + 1450,
-    );
 
     return () => {
       timers.forEach((timer) => window.clearTimeout(timer));
-      window.clearTimeout(hideTimer);
     };
-  }, [sceneReady, reduceMotion]);
+  }, [reduceMotion]);
+
+  useEffect(() => {
+    if (typedCharacterCount < 4 || !sceneReady) return;
+
+    const hideTimer = window.setTimeout(
+      () => setVisible(false),
+      reduceMotion ? 100 : 900,
+    );
+
+    return () => window.clearTimeout(hideTimer);
+  }, [reduceMotion, sceneReady, typedCharacterCount]);
 
   return (
     <AnimatePresence onExitComplete={onComplete}>
@@ -95,6 +99,22 @@ export function PortfolioLoader({
             >
               Frontend Developer
             </motion.p>
+            <div className="mt-5 h-5 text-center text-[12px] font-medium tracking-[0.04em] text-white/45">
+              <AnimatePresence mode="wait">
+                {typedCharacterCount === 4 && !sceneReady && (
+                  <motion.p
+                    key="loading"
+                    role="status"
+                    initial={{ opacity: 0, y: 4 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -3 }}
+                    transition={{ duration: reduceMotion ? 0 : 0.3 }}
+                  >
+                    책상 정리 중입니다...
+                  </motion.p>
+                )}
+              </AnimatePresence>
+            </div>
           </motion.div>
         </motion.div>
       )}

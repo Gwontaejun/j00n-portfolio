@@ -8,7 +8,6 @@ import {
   ContactShadows,
   OrbitControls,
   useGLTF,
-  useProgress,
 } from "@react-three/drei";
 import { Group, MathUtils, MOUSE, PerspectiveCamera, Quaternion, Vector3 } from "three";
 import { AnimatePresence } from "framer-motion";
@@ -38,6 +37,22 @@ type CameraSnapshot = {
   near: number;
   far: number;
 };
+
+function SceneReadySignal({ onReady }: { onReady: () => void }) {
+  const reportedRef = useRef(false);
+
+  useEffect(() => {
+    const frame = window.requestAnimationFrame(() => {
+      if (reportedRef.current) return;
+      reportedRef.current = true;
+      onReady();
+    });
+
+    return () => window.cancelAnimationFrame(frame);
+  }, [onReady]);
+
+  return null;
+}
 
 function CameraSnapshotRecorder({ snapshot }: { snapshot: { current: CameraSnapshot } }) {
   const camera = useThree((state) => state.camera as PerspectiveCamera);
@@ -301,8 +316,6 @@ export function DeskScene({
   const [guestbookFocused, setGuestbookFocused] = useState(false);
   const [guestbookComposerOpen, setGuestbookComposerOpen] = useState(false);
   const [resumeOpen, setResumeOpen] = useState(false);
-  const { active: assetsLoading, progress: assetProgress } = useProgress();
-  const sceneReadyReportedRef = useRef(false);
   const cameraSnapshotRef = useRef<CameraSnapshot>({
     position: new Vector3(...CAMERA_POSITION),
     quaternion: new Quaternion(),
@@ -339,20 +352,6 @@ export function DeskScene({
   useEffect(() => {
     onMonitorFocusChange(monitorFocused || phoneFocused || guestbookFocused);
   }, [monitorFocused, phoneFocused, guestbookFocused, onMonitorFocusChange]);
-
-  useEffect(() => {
-    if (
-      sceneReadyReportedRef.current ||
-      assetsLoading ||
-      assetProgress < 100
-    ) {
-      return;
-    }
-
-    sceneReadyReportedRef.current = true;
-    const frame = window.requestAnimationFrame(onSceneReady);
-    return () => window.cancelAnimationFrame(frame);
-  }, [assetProgress, assetsLoading, onSceneReady]);
 
   return (
     <div className="relative h-full w-full bg-[radial-gradient(circle_at_50%_32%,#252c38_0%,#101319_48%,#080a0e_100%)]">
@@ -420,6 +419,7 @@ export function DeskScene({
             guideTarget={guideTarget}
             phoneForegroundTransformRef={phoneForegroundTransformRef}
           />
+          <SceneReadySignal onReady={onSceneReady} />
         </Suspense>
       </Canvas>
       {phoneFocused && visible && (
