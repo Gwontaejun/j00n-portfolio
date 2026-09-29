@@ -14,7 +14,9 @@ export function MobileExperienceNotice() {
       <div className="relative mx-auto flex w-full max-w-md flex-col">
         <header className="flex items-end justify-between border-b border-white/10 pb-5">
           <div>
-            <p className="text-3xl font-semibold leading-none tracking-[-.06em]">J00N</p>
+            <p className="text-3xl font-semibold leading-none tracking-[-.06em]">
+              J00N
+            </p>
             <p className="mt-2 text-[10px] font-medium tracking-[.18em] text-white/45">
               FRONTEND DEVELOPER
             </p>
@@ -38,9 +40,9 @@ export function MobileExperienceNotice() {
             작업 공간을 둘러보세요.
           </h1>
           <p className="mt-5 max-w-sm text-[15px] leading-7 text-white/58">
-            이 포트폴리오는 3D 책상과 모니터·휴대폰 오브젝트를 직접 조작하는
-            데스크톱 경험에 맞춰 제작되었습니다. PC에서 접속하면 모든 프로젝트와
-            인터랙션을 정상적으로 확인할 수 있습니다.
+            이 포트폴리오는 Three.js로 개발되어 책상과 모니터·휴대폰 모델을 직접
+            조작하는 데스크톱 환경 인터랙티브 경험을 위해 제작되었습니다. PC에서
+            접속하면 모든 프로젝트와 인터랙션을 정상적으로 확인할 수 있습니다.
           </p>
 
           <div className="mt-8 flex items-start gap-3 rounded-xl border border-white/8 bg-white/[.035] p-4 text-[13px] leading-6 text-white/52">
@@ -49,7 +51,10 @@ export function MobileExperienceNotice() {
               className="mt-0.5 shrink-0 text-white/70"
               aria-hidden="true"
             />
-            <p>권장 해상도는 가로 1400px 이상이며 마우스 조작에 최적화되어 있습니다.</p>
+            <p>
+              권장 해상도는 가로 1400px 이상이며 마우스 조작에 최적화되어
+              있습니다.
+            </p>
           </div>
 
           <a
