@@ -18,7 +18,13 @@ import {
   LuTriangle,
   LuWifi,
 } from "react-icons/lu";
-import { SiExpo, SiGithub, SiReact, SiTypescript } from "react-icons/si";
+import {
+  SiExpo,
+  SiGithub,
+  SiGoogleplay,
+  SiReact,
+  SiTypescript,
+} from "react-icons/si";
 import { Euler, Group, Matrix4, Quaternion, Vector3 } from "three";
 import { ModelAsset } from "./ModelAsset";
 import { DESK_TOP_Y } from "../model/scene";
@@ -321,8 +327,10 @@ export function Phone({
                     />
                     <div className="min-w-0 flex-1">
                       <div className="mb-0.5 flex items-center gap-1 text-[5px]">
-                        <span className="size-1 rounded-full bg-amber-400" />
-                        <span className="tracking-[.08em] text-amber-300/70">출시 준비 중</span>
+                        <span className="size-1 rounded-full bg-emerald-400" />
+                        <span className="tracking-[.08em] text-emerald-300/80">
+                          정식 출시
+                        </span>
                       </div>
                       <p className="text-[11px] font-semibold tracking-[-0.025em] text-white">
                         {duckRoutineProject.title}
@@ -335,9 +343,21 @@ export function Phone({
                 </div>
 
                 <div className="mt-1.5 flex items-center gap-1">
-                  <span className="inline-flex h-7 flex-1 items-center justify-center rounded-[7px] border border-white/[.07] text-[6px] font-medium text-white/32">
-                    Play Store 심사 중
-                  </span>
+                  <a
+                    href={duckRoutineProject.href}
+                    target="_blank"
+                    rel="noreferrer"
+                    aria-label="Duck Routine Play Store에서 열기"
+                    onClick={(event) => event.stopPropagation()}
+                    className="inline-flex h-7 flex-1 cursor-pointer items-center justify-center gap-1 rounded-[7px] border border-emerald-400/30 bg-emerald-400/[.12] text-[6.5px] font-medium text-emerald-100 transition hover:border-emerald-300/50 hover:bg-emerald-400/[.18]"
+                  >
+                    <SiGoogleplay
+                      size={8}
+                      className="text-emerald-300"
+                      aria-hidden="true"
+                    />
+                    Play Store
+                  </a>
                   <a
                     href={duckRoutineProject.repositoryHref}
                     target="_blank"

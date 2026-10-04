@@ -1,6 +1,8 @@
 # 프로젝트 상태 및 인수인계
 
-최종 갱신: 2026-09-22
+최종 갱신: 2026-10-04
+
+2026-10-04 Duck Routine이 Google Play 프로덕션에 정식 출시됐다. 휴대폰 상세 상태를 `정식 출시`로 변경하고 Play Store 버튼에 실제 앱 링크를 연결했다.
 
 2026-09-22 최초 진입 로딩 화면을 Three.js `DeskScene` 내부에서 분리해 `PortfolioLoader`로 이동했다. 페이지가 로딩 UI를 즉시 표시하고, `DeskScene`은 `useProgress` 퍼센트가 아니라 Suspense 장면이 실제 마운트된 뒤 준비 완료 신호를 한 번만 전달한다. 로딩 타이핑과 페이드아웃이 모두 끝난 뒤에만 Canvas를 공개하고 온보딩 가이드를 연다.
 
@@ -54,8 +56,8 @@ Tailwind CSS 4는 `postcss.config.mjs`에서 `@tailwindcss/postcss` 플러그인
 
 - Duck Routine | 작은 시작을 돕는 루틴
 - GitHub: https://github.com/Gwontaejun/duck-routine
-- 상태: 출시 준비 중
-- Play Store 링크는 앱 심사 후 `src/data/projects.ts`에 추가한다.
+- 상태: 정식 출시
+- Play Store: https://play.google.com/store/apps/details?id=com.gwontaejun.duckroutine
 - 대표 기술: Expo 54, React Native 0.81, TypeScript 5.9, Expo Router, AsyncStorage
 - 현재 홈 화면에는 Duck Routine 하나만 노출한다.
 
@@ -150,7 +152,6 @@ Tailwind CSS 4는 `postcss.config.mjs`에서 `@tailwindcss/postcss` 플러그인
 
 ## 다음 후보 작업
 
-- Duck Routine Play Store 심사 완료 후 실제 링크 추가
 - 방명록 UX 결정: 모니터 앱으로 넣을지 실제 책상 위 노트 오브젝트로 만들지 미정
 - 휴대폰 실기기 및 좁은 브라우저 화면에서 텍스트 크기와 스크롤 최종 검증
 - 3D 장면과 `Html` 오버레이가 앞뒤에서 올바르게 가려지는지 회귀 검증

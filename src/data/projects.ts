@@ -361,8 +361,7 @@ export const duckRoutineProject: PortfolioProject = {
         "완료 횟수, 연속 일수, 누적 시간과 일별 활동 차트를 확인할 수 있습니다.",
     },
   ],
-  // TODO: Play Store 심사가 끝나면 실제 스토어 URL로 교체하세요.
-  href: "",
+  href: "https://play.google.com/store/apps/details?id=com.gwontaejun.duckroutine",
   repositoryHref: "https://github.com/Gwontaejun/duck-routine",
   image: "/app-project/duck-routine-icon.png",
   accent: "#ff7a16",
